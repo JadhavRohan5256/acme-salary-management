@@ -17,9 +17,7 @@ import java.util.stream.Collectors;
 
 @Component
 public class EmployeeDataSeeder implements CommandLineRunner {
-
     private static final int BATCH_SIZE = 1_000;
-
     private final EmployeeDataGenerator employeeDataGenerator;
     private final EmployeeRepository employeeRepository;
     private final CountryRepository countryRepository;
