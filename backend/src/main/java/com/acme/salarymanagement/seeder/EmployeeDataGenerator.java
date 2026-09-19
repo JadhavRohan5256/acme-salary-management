@@ -77,6 +77,5 @@ public class EmployeeDataGenerator {
             String designation,
             BigDecimal salary,
             String currencyCode
-    ) {
-    }
+    ) {}
 }
