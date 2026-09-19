@@ -1,0 +1,8 @@
+INR
+USD
+GBP
+EUR
+CAD
+AUD
+SGD
+AED
