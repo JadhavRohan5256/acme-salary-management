@@ -60,7 +60,12 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-    	String[] publicRequest = {"/api/auth/login"};
+    	String[] publicRequest = {
+            "/api/auth/login",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/v3/api-docs/**",
+        };
     	
     	httpSecurity
     	.csrf(AbstractHttpConfigurer::disable)
