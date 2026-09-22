@@ -16,11 +16,10 @@ class AnalyticsRepositoryTest {
     @Autowired
     private AnalyticsRepository analyticsRepository;
 
-
     @Test
     void countEmployees_shouldReturnTotalEmployees() {
         long result = analyticsRepository.countEmployees();
-        
+
         assertTrue(result >= 0);
     }
 
@@ -28,7 +27,7 @@ class AnalyticsRepositoryTest {
     @Test
     void countCountries_shouldReturnTotalCountries() {
         long result = analyticsRepository.countCountries();
-        
+
         assertTrue(result >= 0);
     }
 
@@ -36,7 +35,7 @@ class AnalyticsRepositoryTest {
     @Test
     void countDepartments_shouldReturnTotalDepartments() {
         long result = analyticsRepository.countDepartments();
-        
+
         assertTrue(result >= 0);
     }
 
@@ -87,9 +86,6 @@ class AnalyticsRepositoryTest {
 
     @Test
     void findSalariesForDistribution_shouldReturnSalariesForCurrency() {
-        /*
-         * Currency ID 1 is assumed to exist in the test data.
-         */
         List<BigDecimal> result = analyticsRepository.findSalariesForDistribution(
             1L,
             null,
@@ -106,11 +102,6 @@ class AnalyticsRepositoryTest {
 
     @Test
     void findSalariesForDistribution_shouldFilterByCountry() {
-
-        /*
-         * Currency ID 1
-         * Country ID 1
-         */
         List<BigDecimal> result = analyticsRepository.findSalariesForDistribution(
             1L,
             1L,
@@ -127,7 +118,6 @@ class AnalyticsRepositoryTest {
 
     @Test
     void findSalariesForDistribution_shouldFilterByDepartment() {
-
         List<BigDecimal> result = analyticsRepository.findSalariesForDistribution(
             1L,
             null,
@@ -144,7 +134,6 @@ class AnalyticsRepositoryTest {
 
     @Test
     void findSalariesForDistribution_shouldFilterByCountryAndDepartment() {
-
         List<BigDecimal> result = analyticsRepository.findSalariesForDistribution(
             1L,
             1L,
@@ -161,7 +150,6 @@ class AnalyticsRepositoryTest {
 
     @Test
     void findSalariesForDistribution_shouldReturnEmpty_whenNoMatchingCurrency() {
-
         List<BigDecimal> result = analyticsRepository.findSalariesForDistribution(
             999999L,
             null,

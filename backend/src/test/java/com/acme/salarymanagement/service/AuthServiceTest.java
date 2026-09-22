@@ -3,6 +3,7 @@ package com.acme.salarymanagement.service;
 import com.acme.salarymanagement.dto.auth.LoginRequest;
 import com.acme.salarymanagement.dto.auth.LoginResponse;
 import com.acme.salarymanagement.entity.User;
+import com.acme.salarymanagement.exception.ResourceNotFoundException;
 import com.acme.salarymanagement.repository.UserRepository;
 import com.acme.salarymanagement.security.JwtService;
 
@@ -19,6 +20,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,7 +37,7 @@ class AuthServiceTest {
     private LoginRequest loginRequest;
 
     @BeforeEach
-    void setUp() {
+    void beforeEach() {
         authService = new AuthService(
                 authenticationManager,
                 userRepository,
@@ -51,8 +54,35 @@ class AuthServiceTest {
         loginRequest = new LoginRequest("admin", "password123");
     }
 
+    // @Test
+    // void login_shouldReturnLoginResponse_whenCredentialsAreValid() {
+    //     when(userRepository.findByUsername("admin")).thenReturn(Optional.of(user));
+
+    //     when(jwtService.generateToken("admin", "ADMIN")).thenReturn("jwt-token");
+
+    //     LoginResponse result = authService.login(loginRequest);
+
+    //     assertNotNull(result);
+    //     assertEquals("jwt-token", result.accessToken());
+    //     assertEquals("Bearer", result.tokenType());
+    //     assertEquals(3600L, result.expiresIn());
+
+    //     assertNotNull(result.user());
+    //     assertEquals(1L, result.user().id());
+    //     assertEquals("admin", result.user().username());
+    //     assertEquals("ADMIN", result.user().role());
+
+    //     verify(userRepository).findByUsername("admin");
+    //     verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
+    //     verify(jwtService).generateToken("admin", "ADMIN");
+    // }
+
     @Test
     void login_shouldReturnLoginResponse_whenCredentialsAreValid() {
+        when(authenticationManager.authenticate(
+            any(UsernamePasswordAuthenticationToken.class)
+        )).thenReturn(null);
+
         when(userRepository.findByUsername("admin")).thenReturn(Optional.of(user));
 
         when(jwtService.generateToken("admin", "ADMIN")).thenReturn("jwt-token");
@@ -69,22 +99,30 @@ class AuthServiceTest {
         assertEquals("admin", result.user().username());
         assertEquals("ADMIN", result.user().role());
 
+        verify(authenticationManager).authenticate(
+            any(UsernamePasswordAuthenticationToken.class)
+        );
+
         verify(userRepository).findByUsername("admin");
-        verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
         verify(jwtService).generateToken("admin", "ADMIN");
     }
 
     @Test
     void login_shouldThrowException_whenUserDoesNotExist() {
+        when(authenticationManager.authenticate(
+            any(UsernamePasswordAuthenticationToken.class)
+        )).thenReturn(null);
 
-        when(userRepository.findByUsername("admin"))
-                .thenReturn(Optional.empty());
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.empty());
 
-        assertThrows(java.util.NoSuchElementException.class, () -> authService.login(loginRequest));
+        assertThrows(ResourceNotFoundException.class, () -> authService.login(loginRequest));
+
+        verify(authenticationManager).authenticate(
+            any(UsernamePasswordAuthenticationToken.class)
+        );
 
         verify(userRepository).findByUsername("admin");
-
-        verifyNoInteractions(authenticationManager, jwtService);
+        verifyNoInteractions(jwtService);
     }
 
     @Test
@@ -97,9 +135,7 @@ class AuthServiceTest {
         verify(authenticationManager).authenticate(
                 argThat(authentication -> {
 
-                    UsernamePasswordAuthenticationToken token =
-                            (UsernamePasswordAuthenticationToken) authentication;
-
+                    UsernamePasswordAuthenticationToken token =(UsernamePasswordAuthenticationToken) authentication;
                     return token.getPrincipal().equals("admin")
                             && token.getCredentials().equals("password123");
                 })

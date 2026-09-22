@@ -1,5 +1,7 @@
 package com.acme.salarymanagement.config;
 
+import com.acme.salarymanagement.security.CustomAccessDeniedHandler;
+import com.acme.salarymanagement.security.CustomAuthenticationEntryPoint;
 import com.acme.salarymanagement.security.JwtAuthenticationFilter;
 
 import org.springframework.context.annotation.Bean;
@@ -23,13 +25,19 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserDetailsService userDetailsService;
+    private final CustomAuthenticationEntryPoint authenticationEntryPoint;
+    private final CustomAccessDeniedHandler accessDeniedHandler;
     
     public SecurityConfig(
             JwtAuthenticationFilter jwtAuthenticationFilter,
-            UserDetailsService userDetailsService
+            UserDetailsService userDetailsService,
+            CustomAuthenticationEntryPoint authenticationEntryPoint,
+            CustomAccessDeniedHandler accessDeniedHandler
     ) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.userDetailsService = userDetailsService;
+        this.authenticationEntryPoint = authenticationEntryPoint;
+        this.accessDeniedHandler = accessDeniedHandler;
     }
     
     @Bean
@@ -62,6 +70,10 @@ public class SecurityConfig {
     			.anyRequest().authenticated()
          )
     	.authenticationProvider(authenticationProvider())
+    	.exceptionHandling(exception -> exception
+                .authenticationEntryPoint(authenticationEntryPoint)
+                .accessDeniedHandler(accessDeniedHandler)
+        )
     	.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return httpSecurity.build();
