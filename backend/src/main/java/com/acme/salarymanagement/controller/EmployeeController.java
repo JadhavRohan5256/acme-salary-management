@@ -7,6 +7,9 @@ import com.acme.salarymanagement.dto.employee.SalaryUpdateRequest;
 import com.acme.salarymanagement.dto.employee.SalaryUpdateResponse;
 import com.acme.salarymanagement.service.EmployeeService;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -24,9 +27,12 @@ public class EmployeeController {
     @GetMapping
     public ResponseEntity<EmployeePageResponse> getEmployees(
             @RequestParam(defaultValue = "0")
+            @Min(value = 0, message = "Page must be greater than or equal to zero")
             int page,
 
             @RequestParam(defaultValue = "10")
+            @Min(value = 1, message = "Size must be greater than zero")
+            @Max(value = 100, message = "Size cannot exceed 100")
             int size,
 
             @RequestParam(required = false)
@@ -71,7 +77,7 @@ public class EmployeeController {
     @PutMapping("/{employeeId}/salary")
     public ResponseEntity<SalaryUpdateResponse> updateSalary(
             @PathVariable Long employeeId,
-            @RequestBody SalaryUpdateRequest request
+            @Valid @RequestBody SalaryUpdateRequest request
     ) {
         return ResponseEntity.ok(
                 employeeService.updateSalary(employeeId, request)

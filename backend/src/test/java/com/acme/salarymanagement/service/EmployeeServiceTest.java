@@ -10,6 +10,7 @@ import com.acme.salarymanagement.entity.Currency;
 import com.acme.salarymanagement.entity.Employee;
 import com.acme.salarymanagement.entity.SalaryHistory;
 import com.acme.salarymanagement.entity.User;
+import com.acme.salarymanagement.exception.ResourceNotFoundException;
 import com.acme.salarymanagement.repository.CurrencyRepository;
 import com.acme.salarymanagement.repository.EmployeeRepository;
 import com.acme.salarymanagement.repository.SalaryHistoryRepository;
@@ -76,7 +77,7 @@ class EmployeeServiceTest {
     private User user;
 
     @BeforeEach
-    void setUp() {
+    void beforeEach() {
         Country country = Country.builder()
                 .name("India")
                 .code("IN")
@@ -113,11 +114,6 @@ class EmployeeServiceTest {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
-    }
-
-    @AfterEach
-    void tearDown() {
-        SecurityContextHolder.clearContext();
     }
 
     @Test
@@ -300,10 +296,7 @@ class EmployeeServiceTest {
 
         when(employeeRepository.findById(999L)).thenReturn(Optional.empty());
 
-        RuntimeException exception = assertThrows(
-                RuntimeException.class,
-                () -> employeeService.updateSalary(999L, request)
-        );
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> employeeService.updateSalary(999L, request));
 
         assertEquals("Employee not found: 999", exception.getMessage());
 
@@ -323,10 +316,7 @@ class EmployeeServiceTest {
         when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
         when(currencyRepository.findById(999L)).thenReturn(Optional.empty());
 
-        RuntimeException exception = assertThrows(
-                RuntimeException.class,
-                () -> employeeService.updateSalary(1L, request)
-        );
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> employeeService.updateSalary(1L, request));
 
         assertEquals("Currency not found: 999", exception.getMessage());
 
@@ -352,10 +342,7 @@ class EmployeeServiceTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.isAuthenticated()).thenReturn(false);
 
-        RuntimeException exception = assertThrows(
-                RuntimeException.class,
-                () -> employeeService.updateSalary(1L, request)
-        );
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> employeeService.updateSalary(1L, request));
 
         assertEquals("User is not authenticated", exception.getMessage());
 
@@ -390,9 +377,7 @@ class EmployeeServiceTest {
         history2.setCreatedAt(LocalDateTime.of(2026, 4, 25, 10, 0));
 
         when(employeeRepository.existsById(1L)).thenReturn(true);
-
-        when(salaryHistoryRepository.findByEmployeeIdOrderByEffectiveDateDescIdDesc(1L))
-                .thenReturn(List.of(history1, history2));
+        when(salaryHistoryRepository.findByEmployeeIdOrderByEffectiveDateDescIdDesc(1L)).thenReturn(List.of(history1, history2));
 
         List<SalaryHistoryResponse> response = employeeService.getSalaryHistory(1L);
 
@@ -405,7 +390,6 @@ class EmployeeServiceTest {
         assertEquals("USD", response.get(0).currency().code());
         assertEquals(LocalDate.of(2026, 10, 1), response.get(0).effectiveDate());
         assertEquals("admin", response.get(0).changedBy());
-
         assertEquals(1L, response.get(1).id());
         assertEquals(new BigDecimal("100000.00"), response.get(1).previousSalary());
         assertEquals(new BigDecimal("120000.00"), response.get(1).newSalary());
@@ -434,7 +418,7 @@ class EmployeeServiceTest {
     void getSalaryHistory_shouldThrowException_whenEmployeeDoesNotExist() {
         when(employeeRepository.existsById(999L)).thenReturn(false);
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> employeeService.getSalaryHistory(999L));
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> employeeService.getSalaryHistory(999L));
 
         assertEquals("Employee not found: 999", exception.getMessage());
 

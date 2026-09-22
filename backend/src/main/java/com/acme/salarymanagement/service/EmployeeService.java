@@ -12,6 +12,8 @@ import com.acme.salarymanagement.entity.Currency;
 import com.acme.salarymanagement.entity.Employee;
 import com.acme.salarymanagement.entity.SalaryHistory;
 import com.acme.salarymanagement.entity.User;
+import com.acme.salarymanagement.exception.BadRequestException;
+import com.acme.salarymanagement.exception.ResourceNotFoundException;
 import com.acme.salarymanagement.repository.CurrencyRepository;
 import com.acme.salarymanagement.repository.EmployeeRepository;
 import com.acme.salarymanagement.repository.EmployeeSpecification;
@@ -98,7 +100,7 @@ public class EmployeeService {
 
         Employee employee = employeeRepository.findById(employeeId)
         		.orElseThrow(() ->
-		                new RuntimeException(
+		                new ResourceNotFoundException(
 		                        "Employee not found: " + employeeId
 		                )
 		        );
@@ -113,29 +115,35 @@ public class EmployeeService {
         }
 
         String[] parts = sort.split(",");
-
         String field = parts[0];
+        
+        String mappedField = switch (field) {
+                case "firstName" -> "firstName";
+                case "lastName" -> "lastName";
+                case "department" -> "department";
+                case "currentSalary" -> "currentSalary";
+                case "country" -> "country.name";
+                default -> throw new BadRequestException(
+                        "Invalid sort field: " + field
+                );
+        };
 
         Sort.Direction direction = Sort.Direction.ASC;
+        if (parts.length == 2) {
+            direction = Sort.Direction.fromOptionalString(parts[1].trim())
+                .orElseThrow(() ->
+                        new BadRequestException(
+                                "Invalid sort direction: " + parts[1]
+                        )
+                );
 
-        if (parts.length > 1) {
-            direction = Sort.Direction.fromOptionalString(parts[1]).orElse(Sort.Direction.ASC);
         }
 
-        String mappedField = switch (field) {
-            case "firstName" -> "firstName";
-            case "lastName" -> "lastName";
-            case "department" -> "department";
-            case "currentSalary" -> "currentSalary";
-            case "country" -> "country.name";
-            default -> "firstName";
-        };
 
         return Sort.by(direction, mappedField);
     }
 
     private EmployeeResponse toEmployeeResponse(Employee employee) {
-
         return new EmployeeResponse(
                 employee.getId(),
                 employee.getFirstName(),
@@ -191,11 +199,8 @@ public class EmployeeService {
     }
     
     public List<SalaryHistoryResponse> getSalaryHistory(Long employeeId) {
-
         if (!employeeRepository.existsById(employeeId)) {
-            throw new RuntimeException(
-                    "Employee not found: " + employeeId
-            );
+            throw new ResourceNotFoundException("Employee not found: " + employeeId);
         }
 
         return salaryHistoryRepository
@@ -226,14 +231,14 @@ public class EmployeeService {
 
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() ->
-                        new RuntimeException(
+                        new ResourceNotFoundException(
                                 "Employee not found: " + employeeId
                         )
                 );
 
         Currency currency = currencyRepository.findById(request.currencyId())
                 .orElseThrow(() ->
-                        new RuntimeException(
+                        new ResourceNotFoundException(
                                 "Currency not found: " + request.currencyId()
                         )
                 );
@@ -275,25 +280,19 @@ public class EmployeeService {
     }
     
     private User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder
+        		.getContext()
+        		.getAuthentication();
 
-        Authentication authentication =
-                SecurityContextHolder
-                        .getContext()
-                        .getAuthentication();
-
-        if (authentication == null ||
-                !authentication.isAuthenticated()) {
-
-            throw new RuntimeException(
-                    "User is not authenticated"
-            );
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new ResourceNotFoundException("User is not authenticated");
         }
 
         String username = authentication.getName();
 
         return userRepository.findByUsername(username)
                 .orElseThrow(() ->
-                        new RuntimeException(
+                        new ResourceNotFoundException(
                                 "Authenticated user not found: " + username
                         )
                 );
