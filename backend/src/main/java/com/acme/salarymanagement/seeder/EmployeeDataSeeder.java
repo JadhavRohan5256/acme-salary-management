@@ -41,8 +41,6 @@ public class EmployeeDataSeeder implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) {
-
-        // Prevent duplicate employee creation on application restart.
         if (employeeRepository.count() > 0) {
             System.out.println("Employee data already exists. Skipping employee seeding.");
             return;
