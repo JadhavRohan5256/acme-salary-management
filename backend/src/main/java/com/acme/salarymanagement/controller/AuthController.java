@@ -22,4 +22,4 @@ public class AuthController {
         		authService.login(request)
         );
     }
-}
+}	
