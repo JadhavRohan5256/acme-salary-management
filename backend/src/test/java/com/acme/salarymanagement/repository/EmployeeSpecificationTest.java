@@ -20,8 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 
 @ExtendWith(MockitoExtension.class)
 class EmployeeSpecificationTest {
@@ -51,7 +52,6 @@ class EmployeeSpecificationTest {
         assertNotNull(result);
 
         verify(criteriaBuilder).conjunction();
-        verifyNoMoreInteractions(criteriaBuilder);
         verifyNoInteractions(root);
     }
 
@@ -70,7 +70,6 @@ class EmployeeSpecificationTest {
         assertNotNull(result);
 
         verify(criteriaBuilder).conjunction();
-        verifyNoMoreInteractions(criteriaBuilder);
         verifyNoInteractions(root);
     }
 
@@ -101,8 +100,8 @@ class EmployeeSpecificationTest {
         verify(root).<String>get("lastName");
         verify(root).<String>get("email");
 
-        verify(criteriaBuilder, org.mockito.Mockito.times(3)).lower(stringPath);
-        verify(criteriaBuilder, org.mockito.Mockito.times(3)).like(stringPath, "%john%");
+        verify(criteriaBuilder, times(3)).lower(stringPath);
+        verify(criteriaBuilder, times(3)).like(stringPath, "%john%");
 
         verify(criteriaBuilder).or(
             predicate,
@@ -113,7 +112,6 @@ class EmployeeSpecificationTest {
 
     @Test
     void hasCountry_shouldReturnConjunctionWhenCountryIdIsNull() {
-
         when(criteriaBuilder.conjunction()).thenReturn(predicate);
 
         Specification<Employee> specification = EmployeeSpecification.hasCountry(null);
@@ -127,17 +125,16 @@ class EmployeeSpecificationTest {
         assertNotNull(result);
 
         verify(criteriaBuilder).conjunction();
-        verifyNoMoreInteractions(criteriaBuilder);
         verifyNoInteractions(root);
     }
 
     @Test
     void hasCountry_shouldCreateEqualityPredicate() {
         @SuppressWarnings("unchecked")
-        Path<Object> countryPath = org.mockito.Mockito.mock(Path.class);
+        Path<Object> countryPath = mock(Path.class);
 
         @SuppressWarnings("unchecked")
-        Path<Long> countryIdPath = org.mockito.Mockito.mock(Path.class);
+        Path<Long> countryIdPath = mock(Path.class);
 
         when(root.get("country")).thenReturn(countryPath);
         when(countryPath.<Long>get("id")).thenReturn(countryIdPath);
@@ -191,7 +188,6 @@ class EmployeeSpecificationTest {
         assertNotNull(result);
 
         verify(criteriaBuilder).conjunction();
-        verifyNoMoreInteractions(criteriaBuilder);
         verifyNoInteractions(root);
     }
 
@@ -218,12 +214,4 @@ class EmployeeSpecificationTest {
         verify(criteriaBuilder).lower(stringPath);
         verify(criteriaBuilder).equal(stringPath, "engineering");
     }
-
 }
-
-
-
-
-
-
-

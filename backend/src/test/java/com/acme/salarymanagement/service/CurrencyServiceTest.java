@@ -30,25 +30,25 @@ class CurrencyServiceTest {
     @Test
     void getAllCurrencies_shouldReturnCurrencyResponses() {
         Currency inr = Currency.builder()
-                .id(1L)
-                .code("INR")
-                .name("Indian Rupee")
-                .symbol("₹")
-                .build();
+            .id(1L)
+            .code("INR")
+            .name("Indian Rupee")
+            .symbol("₹")
+            .build();
 
         Currency usd = Currency.builder()
-                .id(2L)
-                .code("USD")
-                .name("US Dollar")
-                .symbol("$")
-                .build();
+            .id(2L)
+            .code("USD")
+            .name("US Dollar")
+            .symbol("$")
+            .build();
 
         Currency gbp = Currency.builder()
-                .id(3L)
-                .code("GBP")
-                .name("British Pound")
-                .symbol("£")
-                .build();
+            .id(3L)
+            .code("GBP")
+            .name("British Pound")
+            .symbol("£")
+            .build();
 
         when(currencyRepository.findAll()).thenReturn(List.of(inr, usd, gbp));
 

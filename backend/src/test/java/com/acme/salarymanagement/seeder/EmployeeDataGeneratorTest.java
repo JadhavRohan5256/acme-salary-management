@@ -8,7 +8,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class EmployeeDataGeneratorTest {
@@ -23,7 +26,6 @@ class EmployeeDataGeneratorTest {
     
     @Test
     void shouldGenerate10000Employees() {
-
         List<EmployeeDataGenerator.EmployeeSeedData> employees = generator.generate();
 
         assertEquals(10_000, employees.size());
@@ -31,7 +33,6 @@ class EmployeeDataGeneratorTest {
 
     @Test
     void shouldGenerateUniqueEmails() {
-
         List<EmployeeDataGenerator.EmployeeSeedData> employees = generator.generate();
 
         Set<String> emails = employees.stream()
@@ -43,7 +44,6 @@ class EmployeeDataGeneratorTest {
 
     @Test
     void shouldGenerateEmployeesWithRequiredFields() {
-
         List<EmployeeDataGenerator.EmployeeSeedData> employees = generator.generate();
 
         assertFalse(employees.isEmpty());

@@ -20,9 +20,19 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class EmployeeDataSeederTest {
@@ -36,10 +46,11 @@ class EmployeeDataSeederTest {
     private CurrencyRepository currencyRepository;
     @Mock
     private JdbcTemplate jdbcTemplate;
+
     private EmployeeDataSeeder seeder;
 
     @BeforeEach
-    void setUp() {
+    void beforeEach() {
         seeder = new EmployeeDataSeeder(
                 employeeDataGenerator,
                 employeeRepository,
@@ -52,7 +63,9 @@ class EmployeeDataSeederTest {
     @Test
     void shouldSkipSeedingWhenEmployeesAlreadyExist() {
         when(employeeRepository.count()).thenReturn(5L);
+
         seeder.run();
+
         verify(employeeRepository).count();
         verify(employeeDataGenerator, never()).generate();
         verify(jdbcTemplate, never()).batchUpdate(
@@ -65,28 +78,27 @@ class EmployeeDataSeederTest {
 
     @Test
     void shouldSeedEmployeesWhenDatabaseIsEmpty() {
-    	Country country = mock(Country.class);
-    	Currency currency = mock(Currency.class);
+        Country country = mock(Country.class);
+        Currency currency = mock(Currency.class);
 
-    	when(employeeRepository.count()).thenReturn(0L);
+        when(employeeRepository.count()).thenReturn(0L);
         when(country.getCode()).thenReturn("IN");
         when(currency.getCode()).thenReturn("INR");
         when(countryRepository.findAll()).thenReturn(List.of(country));
         when(currencyRepository.findAll()).thenReturn(List.of(currency));
 
-        List<EmployeeDataGenerator.EmployeeSeedData> employees =
-                List.of(
-                        new EmployeeDataGenerator.EmployeeSeedData(
-                                "John",
-                                "Smith",
-                                "john.smith1@acme.com",
-                                "IN",
-                                "IT",
-                                "Developer",
-                                new BigDecimal("75000.00"),
-                                "INR"
-                        )
-                );
+        List<EmployeeDataGenerator.EmployeeSeedData> employees = List.of(
+                new EmployeeDataGenerator.EmployeeSeedData(
+                        "John",
+                        "Smith",
+                        "john.smith1@acme.com",
+                        "IN",
+                        "IT",
+                        "Developer",
+                        new BigDecimal("75000.00"),
+                        "INR"
+                )
+        );
 
         when(employeeDataGenerator.generate()).thenReturn(employees);
 
@@ -106,98 +118,60 @@ class EmployeeDataSeederTest {
 
     @Test
     void shouldInsertEmployeesInBatchesOf1000() {
-    	Country country = mock(Country.class);
-    	Currency currency = mock(Currency.class);
+        Country country = mock(Country.class);
+        Currency currency = mock(Currency.class);
 
-    	when(employeeRepository.count()).thenReturn(0L);
+        when(employeeRepository.count()).thenReturn(0L);
         when(country.getCode()).thenReturn("IN");
         when(currency.getCode()).thenReturn("INR");
         when(countryRepository.findAll()).thenReturn(List.of(country));
         when(currencyRepository.findAll()).thenReturn(List.of(currency));
 
         List<EmployeeDataGenerator.EmployeeSeedData> employees = IntStream.rangeClosed(1, 2500)
-                        .mapToObj(i ->
-                                new EmployeeDataGenerator.EmployeeSeedData(
-                                        "John",
-                                        "Smith",
-                                        "john.smith" + i + "@acme.com",
-                                        "IN",
-                                        "IT",
-                                        "Developer",
-                                        new BigDecimal("75000.00"),
-                                        "INR"
-                                )
-                        )
-                        .toList();
+        .mapToObj(i ->
+                new EmployeeDataGenerator.EmployeeSeedData(
+                        "John",
+                        "Smith",
+                        "john.smith" + i + "@acme.com",
+                        "IN",
+                        "IT",
+                        "Developer",
+                        new BigDecimal("75000.00"),
+                        "INR"
+                )
+        )
+        .toList();
 
         when(employeeDataGenerator.generate()).thenReturn(employees);
+
         seeder.run();
+
         verify(jdbcTemplate, times(3)).batchUpdate(
-        		contains("INSERT INTO employees"),
-        		anyList(),
-        		anyInt(),
-        		any(ParameterizedPreparedStatementSetter.class)
-        );
-    }
-
-    @Test
-    void shouldContinueSeedingWhenCountryDoesNotExist() {
-
-        when(employeeRepository.count()).thenReturn(0L);
-        when(countryRepository.findAll()).thenReturn(List.of());
-        when(currencyRepository.findAll()).thenReturn(List.of());
-
-        List<EmployeeDataGenerator.EmployeeSeedData> employees =
-                List.of(
-                        new EmployeeDataGenerator.EmployeeSeedData(
-                                "John",
-                                "Smith",
-                                "john.smith1@acme.com",
-                                "IN",
-                                "IT",
-                                "Developer",
-                                new BigDecimal("75000.00"),
-                                "INR"
-                        )
-                );
-
-        when(employeeDataGenerator.generate()).thenReturn(employees);
-
-        assertDoesNotThrow(() -> seeder.run());
-
-        verify(employeeDataGenerator).generate();
-
-        verify(jdbcTemplate).batchUpdate(
                 contains("INSERT INTO employees"),
-                eq(employees),
-                eq(1),
+                anyList(),
+                anyInt(),
                 any(ParameterizedPreparedStatementSetter.class)
         );
     }
 
     @Test
-    void shouldContinueSeedingWhenCurrencyDoesNotExist() {
-
-        Country country = mock(Country.class);
-
+    void shouldContinueSeedingWhenCountryOrCurrencyDoesNotExist() {
         when(employeeRepository.count()).thenReturn(0L);
-        when(country.getCode()).thenReturn("IN");
-        when(countryRepository.findAll()).thenReturn(List.of(country));
+        when(countryRepository.findAll()).thenReturn(List.of());
         when(currencyRepository.findAll()).thenReturn(List.of());
 
-        List<EmployeeDataGenerator.EmployeeSeedData> employees =
-                List.of(
-                        new EmployeeDataGenerator.EmployeeSeedData(
-                                "John",
-                                "Smith",
-                                "john.smith1@acme.com",
-                                "IN",
-                                "IT",
-                                "Developer",
-                                new BigDecimal("75000.00"),
-                                "INR"
-                        )
-                );
+        List<EmployeeDataGenerator.EmployeeSeedData> employees = List.of(
+                new EmployeeDataGenerator.EmployeeSeedData(
+                        "John",
+                        "Smith",
+                        "john.smith1@acme.com",
+                        "IN",
+                        "IT",
+                        "Developer",
+                        new BigDecimal("75000.00"),
+                        "INR"
+                )
+        );
 
         when(employeeDataGenerator.generate()).thenReturn(employees);
 

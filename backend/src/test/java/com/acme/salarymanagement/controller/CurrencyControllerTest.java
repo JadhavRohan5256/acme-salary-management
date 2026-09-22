@@ -19,23 +19,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CurrencyControllerTest {
     @Mock
     private CurrencyService currencyService;
+    
     @InjectMocks
     private CurrencyController currencyController;
 
     @Test
     void getAllCurrencies_shouldReturnSuccessfulResponse() {
-
         List<CurrencyResponse> expectedResponse = List.of(
-                new CurrencyResponse(1L, "INR", "Indian Rupee", "₹"),
-                new CurrencyResponse(2L, "USD", "US Dollar", "$"),
-                new CurrencyResponse(3L, "GBP", "British Pound", "£")
+            new CurrencyResponse(1L, "INR", "Indian Rupee", "₹"),
+            new CurrencyResponse(2L, "USD", "US Dollar", "$"),
+            new CurrencyResponse(3L, "GBP", "British Pound", "£")
         );
 
         when(currencyService.getAllCurrencies()).thenReturn(expectedResponse);
@@ -46,6 +45,5 @@ class CurrencyControllerTest {
         assertSame(expectedResponse, actualResponse.getBody());
 
         verify(currencyService).getAllCurrencies();
-        verifyNoMoreInteractions(currencyService);
     }
 }

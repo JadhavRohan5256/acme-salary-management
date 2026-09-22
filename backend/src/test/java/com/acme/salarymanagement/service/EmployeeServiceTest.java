@@ -402,7 +402,6 @@ class EmployeeServiceTest {
     @Test
     void getSalaryHistory_shouldReturnEmptyList_whenNoHistoryExists() {
         when(employeeRepository.existsById(1L)).thenReturn(true);
-
         when(salaryHistoryRepository.findByEmployeeIdOrderByEffectiveDateDescIdDesc(1L)).thenReturn(List.of());
 
         List<SalaryHistoryResponse> response = employeeService.getSalaryHistory(1L);

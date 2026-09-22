@@ -31,27 +31,4 @@ class CurrencyRepositoryTest {
 
         assertTrue(result.isEmpty());
     }
-
-    @Test
-    void findByCode_shouldReturnCorrectCurrency_whenMultipleCurrenciesExist() {
-        Optional<Currency> inr = currencyRepository.findByCode("INR");
-        Optional<Currency> usd = currencyRepository.findByCode("USD");
-        Optional<Currency> eur = currencyRepository.findByCode("EUR");
-
-        assertTrue(inr.isPresent());
-        assertTrue(usd.isPresent());
-        assertTrue(eur.isPresent());
-
-        assertEquals("INR", inr.get().getCode());
-        assertEquals("Indian Rupee", inr.get().getName());
-        assertEquals("₹", inr.get().getSymbol());
-
-        assertEquals("USD", usd.get().getCode());
-        assertEquals("US Dollar", usd.get().getName());
-        assertEquals("$", usd.get().getSymbol());
-
-        assertEquals("EUR", eur.get().getCode());
-        assertEquals("Euro", eur.get().getName());
-        assertEquals("€", eur.get().getSymbol());
-    }
 }

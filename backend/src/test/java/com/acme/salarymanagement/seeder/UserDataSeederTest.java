@@ -20,17 +20,15 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserDataSeederTest {
-
     @Mock
     private UserRepository userRepository;
-
     @Mock
     private PasswordEncoder passwordEncoder;
 
     private UserDataSeeder seeder;
 
     @BeforeEach
-    void setUp() {
+    void beforeEach() {
         this.seeder = new UserDataSeeder(userRepository, passwordEncoder);
     }
 

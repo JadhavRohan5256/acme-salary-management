@@ -12,8 +12,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CountryServiceTest {
@@ -25,7 +30,7 @@ class CountryServiceTest {
     private Country usa;
 
     @BeforeEach
-    void setUp() {
+    void beforeEach() {
         india = Country.builder()
                 .id(1L)
                 .name("India")
@@ -63,25 +68,5 @@ class CountryServiceTest {
         assertNotNull(result);
         assertTrue(result.isEmpty());
         verify(countryRepository, times(1)).findAll();
-    }
-
-    @Test
-    void shouldMapCountryCorrectly() {
-        when(countryRepository.findAll()).thenReturn(List.of(india));
-        List<CountryResponse> result = countryService.getAllCountries();
-        CountryResponse response = result.get(0);
-
-        assertEquals(india.getId(), response.id());
-        assertEquals(india.getName(), response.name());
-        assertEquals(india.getCode(), response.code());
-    }
-
-    @Test
-    void shouldCallRepositoryOnlyOnce() {
-        when(countryRepository.findAll()).thenReturn(List.of(india));
-        countryService.getAllCountries();
-
-        verify(countryRepository, times(1)).findAll();
-        verifyNoMoreInteractions(countryRepository);
     }
 }

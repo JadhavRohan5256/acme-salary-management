@@ -11,7 +11,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 class SecurityConfigTest {
@@ -19,13 +22,12 @@ class SecurityConfigTest {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private SecurityFilterChain securityFilterChain;
+
     @MockitoBean
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
-
     @Test
     void shouldCreatePasswordEncoder() {
-
         assertNotNull(passwordEncoder);
         assertInstanceOf(BCryptPasswordEncoder.class, passwordEncoder);
     }
@@ -40,7 +42,6 @@ class SecurityConfigTest {
         assertNotEquals(rawPassword, encodedPassword);
         assertTrue(passwordEncoder.matches(rawPassword, encodedPassword));
     }
-
 
     @Test
     void shouldCreateSecurityFilterChain() {

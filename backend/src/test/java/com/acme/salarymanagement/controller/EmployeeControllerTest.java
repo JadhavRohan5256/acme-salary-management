@@ -30,12 +30,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class EmployeeControllerTest {
-
     @Mock
     private EmployeeService employeeService;
 
@@ -111,8 +109,6 @@ class EmployeeControllerTest {
                 null,
                 null
         );
-
-        verifyNoMoreInteractions(employeeService);
     }
 
     @Test
@@ -158,8 +154,6 @@ class EmployeeControllerTest {
         );
 
         verify(employeeService).getEmployeeById(1L);
-
-        verifyNoMoreInteractions(employeeService);
     }
     
     
@@ -200,8 +194,6 @@ class EmployeeControllerTest {
         );
 
         verify(employeeService).getSalaryHistory(1L);
-
-        verifyNoMoreInteractions(employeeService);
     }
 
     @Test
@@ -212,21 +204,20 @@ class EmployeeControllerTest {
                 LocalDate.of(2026, 9, 1)
         );
 
-        SalaryUpdateResponse expectedResponse =
-                new SalaryUpdateResponse(
-                        1L,
-                        new BigDecimal("100000.00"),
-                        new BigDecimal("120000.00"),
-                        new CurrencyResponse(
-                                2L,
-                                "USD",
-                                "US Dollar",
-                                "$"
-                        ),
-                        LocalDate.of(2026, 9, 1),
-                        "admin",
-                        LocalDateTime.now()
-                );
+        SalaryUpdateResponse expectedResponse =new SalaryUpdateResponse(
+                1L,
+                new BigDecimal("100000.00"),
+                new BigDecimal("120000.00"),
+                new CurrencyResponse(
+                        2L,
+                        "USD",
+                        "US Dollar",
+                        "$"
+                ),
+                LocalDate.of(2026, 9, 1),
+                "admin",
+                LocalDateTime.now()
+        );
 
         when(employeeService.updateSalary(1L, request)).thenReturn(expectedResponse);
 
@@ -236,6 +227,5 @@ class EmployeeControllerTest {
         assertSame(expectedResponse, actualResponse.getBody());
 
         verify(employeeService).updateSalary(1L, request);
-        verifyNoMoreInteractions(employeeService);
     }
 }

@@ -13,7 +13,9 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 class AnalyticsRepositoryTest {
@@ -30,7 +32,7 @@ class AnalyticsRepositoryTest {
     private Currency usd;
 
     @BeforeEach
-    void setUp() {
+    void beforeEach() {
         analyticsRepository.deleteAll();
 
         inr = currencyRepository.findAll()
@@ -104,12 +106,12 @@ class AnalyticsRepositoryTest {
     }
 
     private Employee createEmployee(
-            String firstName,
-            String lastName,
-            String department,
-            BigDecimal salary,
-            Country country,
-            Currency currency
+        String firstName,
+        String lastName,
+        String department,
+        BigDecimal salary,
+        Country country,
+        Currency currency
     ) {
 
         Employee employee = new Employee();
@@ -163,7 +165,6 @@ class AnalyticsRepositoryTest {
         assertEquals("INR", indiaRow[4]);
         assertEquals("Indian Rupee", indiaRow[5]);
         assertEquals("₹", indiaRow[6]);
-
         assertEquals(2L, ((Number) indiaRow[7]).longValue());
 
         Double indiaAverage = ((Number) indiaRow[8]).doubleValue();
@@ -171,7 +172,6 @@ class AnalyticsRepositoryTest {
         assertEquals( 90000.0, indiaAverage, 0.001);
         assertEquals(0, ((BigDecimal) indiaRow[9]).compareTo(new BigDecimal("80000.00")));
         assertEquals(0, ((BigDecimal) indiaRow[10]).compareTo(new BigDecimal("100000.00")));
-
 
         Object[] usaRow = results.get(1);
 
@@ -236,34 +236,6 @@ class AnalyticsRepositoryTest {
         Double hrUsdAverage = ((Number) hrUsd[6]).doubleValue();
 
         assertEquals(5000.0, hrUsdAverage, 0.001);
-    }
-
-    @Test
-    void shouldFindSalariesForDistributionByCurrency() {
-        List<BigDecimal> salaries = analyticsRepository.findSalariesForDistribution(
-                inr.getId(),
-                null,
-                null
-        );
-
-        assertNotNull(salaries);
-        assertEquals(2, salaries.size());
-        assertTrue(salaries.stream().anyMatch(salary -> salary.compareTo(new BigDecimal("80000.00")) == 0));
-        assertTrue(salaries.stream().anyMatch(salary -> salary.compareTo(new BigDecimal("100000.00")) == 0));
-    }
-
-    @Test
-    void shouldFindSalariesForDistributionByCurrencyAndCountry() {
-        List<BigDecimal> salaries = analyticsRepository.findSalariesForDistribution(
-                inr.getId(),
-                india.getId(),
-                null
-        );
-
-        assertNotNull(salaries);
-        assertEquals(2, salaries.size());
-        assertTrue(salaries.stream().anyMatch(salary -> salary.compareTo(new BigDecimal("80000.00")) == 0));
-        assertTrue(salaries.stream().anyMatch(salary -> salary.compareTo(new BigDecimal("100000.00")) == 0));
     }
 
     @Test

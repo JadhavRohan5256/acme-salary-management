@@ -13,13 +13,12 @@ import java.util.Date;
 
 @Service
 public class JwtService {
-
     private final SecretKey secretKey;
     private final long expirationMs;
 
     public JwtService(
-            @Value("${security.jwt.secret}") String secret,
-            @Value("${security.jwt.expiration-ms}") long expirationMs
+        @Value("${security.jwt.secret}") String secret,
+        @Value("${security.jwt.expiration-ms}") long expirationMs
     ) {
         this.secretKey = Keys.hmacShaKeyFor(
                 secret.getBytes(StandardCharsets.UTF_8)

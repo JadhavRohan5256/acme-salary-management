@@ -29,10 +29,10 @@ public class SecurityConfig {
     private final CustomAccessDeniedHandler accessDeniedHandler;
     
     public SecurityConfig(
-            JwtAuthenticationFilter jwtAuthenticationFilter,
-            UserDetailsService userDetailsService,
-            CustomAuthenticationEntryPoint authenticationEntryPoint,
-            CustomAccessDeniedHandler accessDeniedHandler
+        JwtAuthenticationFilter jwtAuthenticationFilter,
+        UserDetailsService userDetailsService,
+        CustomAuthenticationEntryPoint authenticationEntryPoint,
+        CustomAccessDeniedHandler accessDeniedHandler
     ) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.userDetailsService = userDetailsService;
@@ -66,13 +66,13 @@ public class SecurityConfig {
     	.csrf(AbstractHttpConfigurer::disable)
     	.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
     	.authorizeHttpRequests(auth -> auth
-    			.requestMatchers(publicRequest).permitAll()
-    			.anyRequest().authenticated()
+    		.requestMatchers(publicRequest).permitAll()
+    		.anyRequest().authenticated()
          )
     	.authenticationProvider(authenticationProvider())
     	.exceptionHandling(exception -> exception
-                .authenticationEntryPoint(authenticationEntryPoint)
-                .accessDeniedHandler(accessDeniedHandler)
+            .authenticationEntryPoint(authenticationEntryPoint)
+            .accessDeniedHandler(accessDeniedHandler)
         )
     	.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

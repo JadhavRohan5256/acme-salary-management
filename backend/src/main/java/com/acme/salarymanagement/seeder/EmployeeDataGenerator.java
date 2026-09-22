@@ -61,21 +61,21 @@ public class EmployeeDataGenerator {
 
     private String generateEmail(String firstName, String lastName, int employeeNumber) {
         return String.format(
-                "%s.%s%d@acme.com",
-                firstName.toLowerCase(),
-                lastName.toLowerCase(),
-                employeeNumber
+            "%s.%s%d@acme.com",
+            firstName.toLowerCase(),
+            lastName.toLowerCase(),
+            employeeNumber
         );
     }
 
     public record EmployeeSeedData(
-            String firstName,
-            String lastName,
-            String email,
-            String countryCode,
-            String department,
-            String designation,
-            BigDecimal salary,
-            String currencyCode
+        String firstName,
+        String lastName,
+        String email,
+        String countryCode,
+        String department,
+        String designation,
+        BigDecimal salary,
+        String currencyCode
     ) {}
 }

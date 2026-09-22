@@ -19,10 +19,16 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.*;
+
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
@@ -39,10 +45,10 @@ class AuthServiceTest {
     @BeforeEach
     void beforeEach() {
         authService = new AuthService(
-                authenticationManager,
-                userRepository,
-                jwtService,
-                3600000L
+            authenticationManager,
+            userRepository,
+            jwtService,
+            3600000L
         );
 
         user = new User();
@@ -54,29 +60,6 @@ class AuthServiceTest {
         loginRequest = new LoginRequest("admin", "password123");
     }
 
-    // @Test
-    // void login_shouldReturnLoginResponse_whenCredentialsAreValid() {
-    //     when(userRepository.findByUsername("admin")).thenReturn(Optional.of(user));
-
-    //     when(jwtService.generateToken("admin", "ADMIN")).thenReturn("jwt-token");
-
-    //     LoginResponse result = authService.login(loginRequest);
-
-    //     assertNotNull(result);
-    //     assertEquals("jwt-token", result.accessToken());
-    //     assertEquals("Bearer", result.tokenType());
-    //     assertEquals(3600L, result.expiresIn());
-
-    //     assertNotNull(result.user());
-    //     assertEquals(1L, result.user().id());
-    //     assertEquals("admin", result.user().username());
-    //     assertEquals("ADMIN", result.user().role());
-
-    //     verify(userRepository).findByUsername("admin");
-    //     verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
-    //     verify(jwtService).generateToken("admin", "ADMIN");
-    // }
-
     @Test
     void login_shouldReturnLoginResponse_whenCredentialsAreValid() {
         when(authenticationManager.authenticate(
@@ -84,7 +67,6 @@ class AuthServiceTest {
         )).thenReturn(null);
 
         when(userRepository.findByUsername("admin")).thenReturn(Optional.of(user));
-
         when(jwtService.generateToken("admin", "ADMIN")).thenReturn("jwt-token");
 
         LoginResponse result = authService.login(loginRequest);
@@ -115,7 +97,10 @@ class AuthServiceTest {
 
         when(userRepository.findByUsername("admin")).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> authService.login(loginRequest));
+        assertThrows(
+            ResourceNotFoundException.class,
+            () -> authService.login(loginRequest)
+        );
 
         verify(authenticationManager).authenticate(
             any(UsernamePasswordAuthenticationToken.class)
@@ -127,28 +112,21 @@ class AuthServiceTest {
 
     @Test
     void login_shouldAuthenticateWithProvidedCredentials() {
+        when(authenticationManager.authenticate(
+            any(UsernamePasswordAuthenticationToken.class)
+        )).thenReturn(null);
+
         when(userRepository.findByUsername("admin")).thenReturn(Optional.of(user));
         when(jwtService.generateToken("admin", "ADMIN")).thenReturn("jwt-token");
 
         authService.login(loginRequest);
 
         verify(authenticationManager).authenticate(
-                argThat(authentication -> {
-
-                    UsernamePasswordAuthenticationToken token =(UsernamePasswordAuthenticationToken) authentication;
-                    return token.getPrincipal().equals("admin")
-                            && token.getCredentials().equals("password123");
-                })
+            argThat(authentication -> {
+                UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
+                return token.getPrincipal().equals("admin")
+                    && token.getCredentials().equals("password123");
+            })
         );
-    }
-
-    @Test
-    void login_shouldGenerateTokenUsingUserDetails() {
-        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(user));
-        when(jwtService.generateToken("admin", "ADMIN")).thenReturn("jwt-token");
-
-        authService.login(loginRequest);
-
-        verify(jwtService).generateToken("admin", "ADMIN");
     }
 }

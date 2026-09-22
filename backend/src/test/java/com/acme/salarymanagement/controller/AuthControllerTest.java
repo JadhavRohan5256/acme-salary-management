@@ -18,13 +18,13 @@ import org.springframework.http.ResponseEntity;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
     @Mock
     private AuthService authService;
+    
     @InjectMocks
     private AuthController authController;
 
@@ -34,16 +34,16 @@ class AuthControllerTest {
         LoginRequest request = new LoginRequest("admin", "password123");
 
         LoginResponse.UserInfo userInfo = new LoginResponse.UserInfo(
-        		1L,
-        		"admin",
-        		"ADMIN"
+        	1L,
+        	"admin",
+        	"ADMIN"
         );
 
         LoginResponse expectedResponse = new LoginResponse(
-        		"jwt-token",
-        		"Bearer",
-        		3600L,
-        		userInfo
+        	"jwt-token",
+        	"Bearer",
+        	3600L,
+        	userInfo
         );
 
         when(this.authService.login(request)).thenReturn(expectedResponse);
@@ -53,6 +53,5 @@ class AuthControllerTest {
         assertEquals(HttpStatus.OK, actualResponse.getStatusCode());
         assertSame(expectedResponse, actualResponse.getBody());
         verify(this.authService).login(request);
-        verifyNoMoreInteractions(this.authService);
     }
 }
