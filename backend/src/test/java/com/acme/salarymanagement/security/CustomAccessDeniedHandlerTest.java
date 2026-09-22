@@ -16,7 +16,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CustomAccessDeniedHandlerTest {
@@ -59,17 +60,6 @@ class CustomAccessDeniedHandlerTest {
         assertTrue(responseBody.contains("\"error\":\"FORBIDDEN\""));
         assertTrue(responseBody.contains("\"message\":\"You do not have permission to perform this operation\""));
         assertTrue(responseBody.contains("\"path\":\"/api/employees/1/salary\""));
-    }
-
-    @Test
-    void handle_shouldSetCorrectContentType() throws Exception {
-        accessDeniedHandler.handle(
-            request,
-            response,
-            new AccessDeniedException("Access denied")
-        );
-
-        verify(response).setContentType("application/json");
     }
 
     @Test

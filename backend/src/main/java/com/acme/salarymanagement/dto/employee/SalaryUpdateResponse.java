@@ -14,5 +14,4 @@ public record SalaryUpdateResponse(
         LocalDate effectiveDate,
         String updatedBy,
         LocalDateTime updatedAt
-) {
-}
+) {}

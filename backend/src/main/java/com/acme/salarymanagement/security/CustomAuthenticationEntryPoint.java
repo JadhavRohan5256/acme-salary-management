@@ -15,7 +15,6 @@ import java.time.Instant;
 
 @Component
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
-
     private final ObjectMapper objectMapper;
 
     public CustomAuthenticationEntryPoint(ObjectMapper objectMapper) {
@@ -29,19 +28,19 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
             AuthenticationException authException) throws IOException {
 
         ErrorResponse errorResponse = new ErrorResponse(
-                Instant.now(),
-                HttpStatus.UNAUTHORIZED.value(),
-                "UNAUTHORIZED",
-                "Authentication required or token is invalid",
-                request.getRequestURI(),
-                null
+            Instant.now(),
+            HttpStatus.UNAUTHORIZED.value(),
+            "UNAUTHORIZED",
+            "Authentication required or token is invalid",
+            request.getRequestURI(),
+            null
         );
 
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
         response.getWriter().write(
-                objectMapper.writeValueAsString(errorResponse)
+            objectMapper.writeValueAsString(errorResponse)
         );
     }
 }

@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ResourceNotFoundExceptionTest {
-
     @Test
     void shouldCreateExceptionWithMessage() {
         String message = "Employee not found";

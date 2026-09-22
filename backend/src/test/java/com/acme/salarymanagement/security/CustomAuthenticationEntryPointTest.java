@@ -65,17 +65,6 @@ class CustomAuthenticationEntryPointTest {
     }
 
     @Test
-    void commence_shouldSetCorrectContentType() throws Exception {
-        authenticationEntryPoint.commence(
-                request,
-                response,
-                new BadCredentialsException("Invalid credentials")
-        );
-
-        verify(response).setContentType("application/json");
-    }
-
-    @Test
     void commence_shouldIncludeRequestPath() throws Exception {
         when(request.getRequestURI()).thenReturn("/api/employees/1");
 

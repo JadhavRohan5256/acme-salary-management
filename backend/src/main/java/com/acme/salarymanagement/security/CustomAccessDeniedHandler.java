@@ -16,7 +16,6 @@ import java.time.Instant;
 
 @Component
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
-
     private final ObjectMapper objectMapper;
 
     public CustomAccessDeniedHandler(ObjectMapper objectMapper) {
@@ -30,12 +29,12 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
             AccessDeniedException accessDeniedException) throws IOException {
 
         ErrorResponse errorResponse = new ErrorResponse(
-                Instant.now(),
-                HttpStatus.FORBIDDEN.value(),
-                "FORBIDDEN",
-                "You do not have permission to perform this operation",
-                request.getRequestURI(),
-                null
+            Instant.now(),
+            HttpStatus.FORBIDDEN.value(),
+            "FORBIDDEN",
+            "You do not have permission to perform this operation",
+            request.getRequestURI(),
+            null
         );
 
         response.setStatus(HttpStatus.FORBIDDEN.value());

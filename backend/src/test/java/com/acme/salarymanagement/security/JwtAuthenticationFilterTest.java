@@ -16,12 +16,22 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import io.jsonwebtoken.JwtException;
+
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class JwtAuthenticationFilterTest {
@@ -35,10 +45,11 @@ class JwtAuthenticationFilterTest {
     private HttpServletResponse response;
     @Mock
     private FilterChain filterChain;
+    
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @BeforeEach
-    void setUp() {
+    void beforeEach() {
         jwtAuthenticationFilter = new JwtAuthenticationFilter(jwtService, userDetailsService);
 
         SecurityContextHolder.clearContext();
@@ -54,9 +65,9 @@ class JwtAuthenticationFilterTest {
         when(request.getHeader("Authorization")).thenReturn(null);
 
         jwtAuthenticationFilter.doFilterInternal(
-                request,
-                response,
-                filterChain
+            request,
+            response,
+            filterChain
         );
 
         verify(filterChain).doFilter(request, response);
@@ -67,13 +78,12 @@ class JwtAuthenticationFilterTest {
 
     @Test
     void doFilterInternal_shouldContinueFilterChain_whenAuthorizationHeaderDoesNotStartWithBearer() throws Exception {
-
         when(request.getHeader("Authorization")).thenReturn("Basic abc123");
 
         jwtAuthenticationFilter.doFilterInternal(
-                request,
-                response,
-                filterChain
+            request,
+            response,
+            filterChain
         );
 
         verify(filterChain).doFilter(request, response);
@@ -84,13 +94,12 @@ class JwtAuthenticationFilterTest {
 
     @Test
     void doFilterInternal_shouldAuthenticateUser_whenTokenIsValid() throws Exception {
-
         String token = "valid-jwt-token";
 
         UserDetails userDetails = new User(
-        		"admin",
-        		"password",
-        		List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
+        	"admin",
+        	"password",
+        	List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
         );
 
         when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
@@ -99,9 +108,9 @@ class JwtAuthenticationFilterTest {
         when(jwtService.isTokenValid(token, userDetails)).thenReturn(true);
 
         jwtAuthenticationFilter.doFilterInternal(
-                request,
-                response,
-                filterChain
+            request,
+            response,
+            filterChain
         );
 
         assertNotNull(SecurityContextHolder.getContext().getAuthentication());
@@ -120,23 +129,20 @@ class JwtAuthenticationFilterTest {
         String token = "invalid-jwt-token";
 
         UserDetails userDetails = new User(
-        		"admin",
-        		"password",
-        		List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
+        	"admin",
+        	"password",
+        	List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
         );
 
         when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
-
         when(jwtService.extractUsername(token)).thenReturn("admin");
-
         when(userDetailsService.loadUserByUsername("admin")).thenReturn(userDetails);
-
         when(jwtService.isTokenValid(token, userDetails)).thenReturn(false);
 
         jwtAuthenticationFilter.doFilterInternal(
-                request,
-                response,
-                filterChain
+            request,
+            response,
+            filterChain
         );
 
         assertNull(SecurityContextHolder.getContext().getAuthentication());
@@ -152,13 +158,12 @@ class JwtAuthenticationFilterTest {
         String token = "jwt-token";
 
         when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
-
         when(jwtService.extractUsername(token)).thenReturn(null);
 
         jwtAuthenticationFilter.doFilterInternal(
-                request,
-                response,
-                filterChain
+            request,
+            response,
+            filterChain
         );
 
         assertNull(SecurityContextHolder.getContext().getAuthentication());
@@ -173,25 +178,23 @@ class JwtAuthenticationFilterTest {
         String token = "valid-jwt-token";
 
         UserDetails existingUser = new User(
-        		"existingUser",
-        		"password",
-        		List.of(new SimpleGrantedAuthority("ROLE_USER"))
+        	"existingUser",
+        	"password",
+        	List.of(new SimpleGrantedAuthority("ROLE_USER"))
         );
 
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-        		existingUser,
-        		null,
-        		existingUser.getAuthorities()
+        	existingUser,
+        	null,
+        	existingUser.getAuthorities()
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
-
         when(jwtService.extractUsername(token)).thenReturn("admin");
 
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
-
         assertSame(authentication, SecurityContextHolder.getContext().getAuthentication());
 
         verify(jwtService).extractUsername(token);
@@ -204,10 +207,9 @@ class JwtAuthenticationFilterTest {
         String token = "invalid-token";
 
         when(request.getHeader("Authorization")).thenReturn("Bearer " + token);
-        when(jwtService.extractUsername(token)).thenThrow(new RuntimeException("Invalid JWT"));
+        when(jwtService.extractUsername(token)).thenThrow(new JwtException("Invalid JWT"));
 
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
-
         assertNull(SecurityContextHolder.getContext().getAuthentication());
 
         verify(jwtService).extractUsername(token);

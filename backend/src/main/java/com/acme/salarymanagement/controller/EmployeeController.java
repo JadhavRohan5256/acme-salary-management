@@ -26,26 +26,26 @@ public class EmployeeController {
 
     @GetMapping
     public ResponseEntity<EmployeePageResponse> getEmployees(
-            @RequestParam(defaultValue = "0")
-            @Min(value = 0, message = "Page must be greater than or equal to zero")
-            int page,
+        @RequestParam(defaultValue = "0")
+        @Min(value = 0, message = "Page must be greater than or equal to zero")
+        int page,
 
-            @RequestParam(defaultValue = "10")
-            @Min(value = 1, message = "Size must be greater than zero")
-            @Max(value = 100, message = "Size cannot exceed 100")
-            int size,
+        @RequestParam(defaultValue = "10")
+        @Min(value = 1, message = "Size must be greater than zero")
+        @Max(value = 100, message = "Size cannot exceed 100")
+        int size,
 
-            @RequestParam(required = false)
-            String search,
+        @RequestParam(required = false)
+        String search,
 
-            @RequestParam(required = false)
-            Long countryId,
+        @RequestParam(required = false)
+        Long countryId,
 
-            @RequestParam(required = false)
-            String department,
+        @RequestParam(required = false)
+        String department,
 
-            @RequestParam(required = false)
-            String sort
+        @RequestParam(required = false)
+        String sort
     ) {
 
         return ResponseEntity.ok(
@@ -66,9 +66,7 @@ public class EmployeeController {
     }
     
     @GetMapping("/{employeeId}/salary-history")
-    public ResponseEntity<List<SalaryHistoryResponse>> getSalaryHistory(
-            @PathVariable Long employeeId
-    ) {
+    public ResponseEntity<List<SalaryHistoryResponse>> getSalaryHistory(@PathVariable Long employeeId) {
         return ResponseEntity.ok(
                 employeeService.getSalaryHistory(employeeId)
         );
@@ -76,8 +74,8 @@ public class EmployeeController {
 
     @PutMapping("/{employeeId}/salary")
     public ResponseEntity<SalaryUpdateResponse> updateSalary(
-            @PathVariable Long employeeId,
-            @Valid @RequestBody SalaryUpdateRequest request
+        @PathVariable Long employeeId,
+        @Valid @RequestBody SalaryUpdateRequest request
     ) {
         return ResponseEntity.ok(
                 employeeService.updateSalary(employeeId, request)

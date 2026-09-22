@@ -16,12 +16,12 @@ public class CountryService {
 
     public List<CountryResponse> getAllCountries() {
         return countryRepository.findAll()
-                .stream()
-                .map(country -> new CountryResponse(
-                        country.getId(),
-                        country.getName(),
-                        country.getCode()
-                ))
-                .toList();
+            .stream()
+            .map(country -> new CountryResponse(
+                    country.getId(),
+                    country.getName(),
+                    country.getCode()
+            ))
+            .toList();
     }
 }

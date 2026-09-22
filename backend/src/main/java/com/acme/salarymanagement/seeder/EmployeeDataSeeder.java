@@ -25,11 +25,11 @@ public class EmployeeDataSeeder implements CommandLineRunner {
     private final JdbcTemplate jdbcTemplate;
 
     public EmployeeDataSeeder(
-            EmployeeDataGenerator employeeDataGenerator,
-            EmployeeRepository employeeRepository,
-            CountryRepository countryRepository,
-            CurrencyRepository currencyRepository,
-            JdbcTemplate jdbcTemplate
+        EmployeeDataGenerator employeeDataGenerator,
+        EmployeeRepository employeeRepository,
+        CountryRepository countryRepository,
+        CurrencyRepository currencyRepository,
+        JdbcTemplate jdbcTemplate
     ) {
         this.employeeDataGenerator = employeeDataGenerator;
         this.employeeRepository = employeeRepository;
@@ -49,12 +49,12 @@ public class EmployeeDataSeeder implements CommandLineRunner {
         System.out.println("Starting employee data seeding...");
 
         Map<String, Country> countries = countryRepository.findAll()
-                .stream()
-                .collect(Collectors.toMap(Country::getCode, Function.identity()));
+            .stream()
+            .collect(Collectors.toMap(Country::getCode, Function.identity()));
 
         Map<String, Currency> currencies = currencyRepository.findAll()
-                .stream()
-                .collect(Collectors.toMap(Currency::getCode, Function.identity()));
+            .stream()
+            .collect(Collectors.toMap(Currency::getCode, Function.identity()));
 
         List<EmployeeDataGenerator.EmployeeSeedData> employees = employeeDataGenerator.generate();
 

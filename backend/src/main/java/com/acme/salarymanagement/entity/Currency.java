@@ -21,7 +21,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class Currency {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -1,19 +1,23 @@
 package com.acme.salarymanagement.seeder;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+
 class SeedDataResourceReaderTest {
     private SeedDataResourceReader reader;
     private List<List<String>> results;
     
-    @BeforeAll
+    @BeforeEach
     void beforeEach() {
     	this.reader = new SeedDataResourceReader();
     	this.results = List.of(

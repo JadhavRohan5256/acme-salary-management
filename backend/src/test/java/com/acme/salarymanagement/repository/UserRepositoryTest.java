@@ -13,14 +13,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 class UserRepositoryTest {
-
     @Autowired
     private UserRepository userRepository;
 
     @Test
     void findByUsername_shouldReturnUser_whenUsernameExists() {
         User user = new User();
-
         user.setUsername("testuser");
         user.setPasswordHash("password123");
         user.setRole("USER");
@@ -36,7 +34,6 @@ class UserRepositoryTest {
     @Test
     void existsByUsername_shouldReturnTrue_whenUsernameExists() {
         User user = new User();
-
         user.setUsername("testuser");
         user.setPasswordHash("password123");
         user.setRole("USER");
@@ -44,7 +41,6 @@ class UserRepositoryTest {
         userRepository.save(user);
 
         boolean result = userRepository.existsByUsername("testuser");
-
         assertTrue(result);
     }
 

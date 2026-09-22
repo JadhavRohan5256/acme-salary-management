@@ -7,19 +7,11 @@ import java.time.LocalDateTime;
 import com.acme.salarymanagement.dto.currency.CurrencyResponse;
 
 public record SalaryHistoryResponse(
-
         Long id,
-
         BigDecimal previousSalary,
-
         BigDecimal newSalary,
-
         CurrencyResponse currency,
-
         LocalDate effectiveDate,
-
         String changedBy,
-
         LocalDateTime createdAt
-) {
-}
+) {}

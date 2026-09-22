@@ -10,9 +10,9 @@ public record DepartmentAnalyticsResponse(
 ) {
 
     public record CurrencyInfo(
-            Long id,
-            String code,
-            String name,
-            String symbol
+        Long id,
+        String code,
+        String name,
+        String symbol
     ) {}
 }

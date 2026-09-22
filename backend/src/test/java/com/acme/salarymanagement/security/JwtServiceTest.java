@@ -6,9 +6,6 @@ import io.jsonwebtoken.security.Keys;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,16 +14,19 @@ import javax.crypto.SecretKey;
 
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@ExtendWith(MockitoExtension.class)
 class JwtServiceTest {
     private JwtService jwtService;
     private static final String SECRET = "my-super-secret-key-that-is-at-least-32-characters-long";
     private static final long EXPIRATION_MS = 3600000L;
 
     @BeforeEach
-    void setUp() {
+    void beforeEach() {
         jwtService = new JwtService(SECRET, EXPIRATION_MS);
     }
 
@@ -48,16 +48,14 @@ class JwtServiceTest {
 
     @Test
     void generateToken_shouldContainRole() {
-
         String token = jwtService.generateToken("admin", "ADMIN");
-
         SecretKey key = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
 
         Claims claims = Jwts.parser()
-        		.verifyWith(key)
-        		.build()
-        		.parseSignedClaims(token)
-        		.getPayload();
+            .verifyWith(key)
+        	.build()
+        	.parseSignedClaims(token)
+        	.getPayload();
 
         assertEquals("ADMIN", claims.get("role"));
     }
@@ -69,10 +67,10 @@ class JwtServiceTest {
         SecretKey key = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
 
         Claims claims = Jwts.parser()
-        		.verifyWith(key)
-        		.build()
-        		.parseSignedClaims(token)
-        		.getPayload();
+        	.verifyWith(key)
+        	.build()
+        	.parseSignedClaims(token)
+        	.getPayload();
 
         assertNotNull(claims.getIssuedAt());
         assertNotNull(claims.getExpiration());
@@ -92,9 +90,9 @@ class JwtServiceTest {
         String token = jwtService.generateToken("admin", "ADMIN");
 
         UserDetails userDetails = User.withUsername("admin")
-        		.password("password")
-        		.roles("ADMIN")
-        		.build();
+        	.password("password")
+        	.roles("ADMIN")
+        	.build();
 
         boolean result = jwtService.isTokenValid(token, userDetails);
 
@@ -106,9 +104,9 @@ class JwtServiceTest {
         String token = jwtService.generateToken("admin", "ADMIN");
 
         UserDetails userDetails = User.withUsername("user")
-        		.password("password")
-        		.roles("USER")
-        		.build();
+        	.password("password")
+        	.roles("USER")
+        	.build();
 
         boolean result = jwtService.isTokenValid(token, userDetails);
 
@@ -122,9 +120,9 @@ class JwtServiceTest {
         String token = expiredJwtService.generateToken("admin", "ADMIN");
 
         UserDetails userDetails = User.withUsername("admin")
-        		.password("password")
-        		.roles("ADMIN")
-        		.build();
+        	.password("password")
+        	.roles("ADMIN")
+        	.build();
 
         assertThrows(io.jsonwebtoken.ExpiredJwtException.class, () -> expiredJwtService.isTokenValid(token, userDetails));
     }
@@ -143,12 +141,12 @@ class JwtServiceTest {
         SecretKey differentKey = Keys.hmacShaKeyFor(differentSecret.getBytes(StandardCharsets.UTF_8));
 
         String token = Jwts.builder()
-        		.subject("admin")
-        		.claim("role", "ADMIN")
-        		.issuedAt(new java.util.Date())
-        		.expiration(new java.util.Date(System.currentTimeMillis() + 3600000L))
-        		.signWith(differentKey)
-        		.compact();
+        	.subject("admin")
+        	.claim("role", "ADMIN")
+        	.issuedAt(new java.util.Date())
+        	.expiration(new java.util.Date(System.currentTimeMillis() + 3600000L))
+        	.signWith(differentKey)
+        	.compact();
 
         assertThrows(Exception.class, () -> jwtService.extractUsername(token));
     }

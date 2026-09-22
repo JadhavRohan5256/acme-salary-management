@@ -13,8 +13,8 @@ public class UserDataSeeder implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
 
     public UserDataSeeder(
-            UserRepository userRepository,
-            PasswordEncoder passwordEncoder
+        UserRepository userRepository,
+        PasswordEncoder passwordEncoder
     ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
@@ -27,7 +27,6 @@ public class UserDataSeeder implements CommandLineRunner {
         }
 
         User user = new User();
-
         user.setUsername("hrmanager");
         user.setPasswordHash(passwordEncoder.encode("Admin@123"));
         user.setRole("HR_MANAGER");

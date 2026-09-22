@@ -12,15 +12,15 @@ public record CountryAnalyticsResponse(
 ) {
 
     public record CountryInfo(
-            Long id,
-            String name,
-            String code
+        Long id,
+        String name,
+        String code
     ) {}
 
     public record CurrencyInfo(
-            Long id,
-            String code,
-            String name,
-            String symbol
+        Long id,
+        String code,
+        String name,
+        String symbol
     ) {}
 }

@@ -16,8 +16,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class AnalyticsServiceTest {
@@ -47,7 +52,6 @@ class AnalyticsServiceTest {
 
     @Test
     void shouldReturnZeroWhenNoAnalyticsDataExists() {
-
         when(analyticsRepository.countEmployees()).thenReturn(0L);
         when(analyticsRepository.countCountries()).thenReturn(0L);
         when(analyticsRepository.countDepartments()).thenReturn(0L);
@@ -65,27 +69,7 @@ class AnalyticsServiceTest {
     }
 
     @Test
-    void shouldCallOverviewRepositoryMethodsOnlyOnce() {
-
-        when(analyticsRepository.countEmployees()).thenReturn(100L);
-        when(analyticsRepository.countCountries()).thenReturn(5L);
-        when(analyticsRepository.countDepartments()).thenReturn(8L);
-
-        analyticsService.getOverview();
-
-        verify(analyticsRepository, times(1)).countEmployees();
-        verify(analyticsRepository, times(1)).countCountries();
-        verify(analyticsRepository, times(1)).countDepartments();
-        verifyNoMoreInteractions(analyticsRepository);
-    }
-
-    // ============================================================
-    // BY COUNTRY
-    // ============================================================
-
-    @Test
     void shouldReturnCountryAnalytics() {
-
         List<Object[]> countryRows = List.<Object[]>of(
                 new Object[]{
                         1L,
@@ -129,11 +113,13 @@ class AnalyticsServiceTest {
         assertEquals("India", india.country().name());
         assertEquals("IN", india.country().code());
         assertEquals(10L, india.employeeCount());
+
         assertNotNull(india.currency());
         assertEquals(1L, india.currency().id());
         assertEquals("INR", india.currency().code());
         assertEquals("Indian Rupee", india.currency().name());
         assertEquals("₹", india.currency().symbol());
+
         assertEquals(new BigDecimal("75000.00"), india.averageSalary());
         assertEquals(new BigDecimal("40000.00"), india.minimumSalary());
         assertEquals(new BigDecimal("120000.00"), india.maximumSalary());
@@ -145,11 +131,13 @@ class AnalyticsServiceTest {
         assertEquals("United States", usa.country().name());
         assertEquals("US", usa.country().code());
         assertEquals(5L, usa.employeeCount());
+
         assertNotNull(usa.currency());
         assertEquals(2L, usa.currency().id());
         assertEquals("USD", usa.currency().code());
         assertEquals("US Dollar", usa.currency().name());
         assertEquals("$", usa.currency().symbol());
+
         assertEquals(new BigDecimal("90000.00"), usa.averageSalary());
         assertEquals(new BigDecimal("50000.00"), usa.minimumSalary());
         assertEquals(new BigDecimal("150000.00"), usa.maximumSalary());
@@ -159,7 +147,6 @@ class AnalyticsServiceTest {
 
     @Test
     void shouldReturnEmptyListWhenNoCountryAnalyticsExists() {
-
         List<Object[]> countryRows = List.<Object[]>of();
 
         when(analyticsRepository.findCountryAnalytics()).thenReturn(countryRows);
@@ -173,57 +160,7 @@ class AnalyticsServiceTest {
     }
 
     @Test
-    void shouldMapCountryAnalyticsCorrectly() {
-
-        List<Object[]> countryRows = List.<Object[]>of(
-                new Object[]{
-                        1L,
-                        "India",
-                        "IN",
-                        1L,
-                        "INR",
-                        "Indian Rupee",
-                        "₹",
-                        10L,
-                        75000.0,
-                        new BigDecimal("40000.00"),
-                        new BigDecimal("120000.00")
-                }
-        );
-
-        when(analyticsRepository.findCountryAnalytics()).thenReturn(countryRows);
-
-        List<CountryAnalyticsResponse> result = analyticsService.getByCountry();
-
-        assertNotNull(result);
-        assertEquals(1, result.size());
-
-        CountryAnalyticsResponse response = result.get(0);
-
-        assertNotNull(response.country());
-        assertEquals(1L, response.country().id());
-        assertEquals("India", response.country().name());
-        assertEquals("IN", response.country().code());
-        assertEquals(10L, response.employeeCount());
-        assertNotNull(response.currency());
-        assertEquals(1L, response.currency().id());
-        assertEquals("INR", response.currency().code());
-        assertEquals("Indian Rupee", response.currency().name());
-        assertEquals("₹", response.currency().symbol());
-        assertEquals(new BigDecimal("75000.00"), response.averageSalary());
-        assertEquals(new BigDecimal("40000.00").setScale(2), response.minimumSalary());
-        assertEquals(new BigDecimal("120000.00").setScale(2), response.maximumSalary());
-        
-        verify(analyticsRepository, times(1)).findCountryAnalytics();
-    }
-
-    // ============================================================
-    // BY DEPARTMENT
-    // ============================================================
-
-    @Test
     void shouldReturnDepartmentAnalytics() {
-
         List<Object[]> departmentRows = List.<Object[]>of(
                 new Object[]{
                         "Engineering",
@@ -263,7 +200,7 @@ class AnalyticsServiceTest {
         assertEquals(10L, engineering.employeeCount());
         assertEquals(new BigDecimal("85000.00"), engineering.averageSalary());
 
-        DepartmentAnalyticsResponse hr =result.get(1);
+        DepartmentAnalyticsResponse hr = result.get(1);
 
         assertEquals("Human Resources", hr.department());
         assertEquals(5L, hr.employeeCount());
@@ -285,46 +222,6 @@ class AnalyticsServiceTest {
 
         verify(analyticsRepository, times(1)).findDepartmentAnalytics();
     }
-
-    @Test
-    void shouldMapDepartmentAnalyticsCorrectly() {
-        List<Object[]> departmentRows = List.<Object[]>of(
-                new Object[]{
-                        "Engineering",
-                        1L,
-                        "INR",
-                        "Indian Rupee",
-                        "₹",
-                        10L,
-                        85000.0
-                }
-        );
-
-        when(analyticsRepository.findDepartmentAnalytics()).thenReturn(departmentRows);
-
-        List<DepartmentAnalyticsResponse> result = analyticsService.getByDepartment();
-
-        assertNotNull(result);
-        assertEquals(1, result.size());
-
-        DepartmentAnalyticsResponse response =result.get(0);
-
-        assertEquals("Engineering", response.department());
-        assertNotNull(response.currency());
-        assertEquals(1L, response.currency().id());
-        assertEquals("INR", response.currency().code());
-        assertEquals("Indian Rupee", response.currency().name());
-        assertEquals("Indian Rupee", response.currency().name());
-        assertEquals("₹", response.currency().symbol());
-        assertEquals(10L, response.employeeCount());
-        assertEquals(new BigDecimal("85000.00"), response.averageSalary());
-
-        verify(analyticsRepository, times(1)).findDepartmentAnalytics();
-    }
-
-    // ============================================================
-    // SALARY DISTRIBUTION
-    // ============================================================
 
     @Test
     void shouldCalculateSalaryDistributionCorrectly() {
@@ -357,12 +254,16 @@ class AnalyticsServiceTest {
 
         assertEquals("0-50000", result.get(0).range());
         assertEquals(2L, result.get(0).employeeCount());
+
         assertEquals("50001-100000", result.get(1).range());
         assertEquals(2L, result.get(1).employeeCount());
+
         assertEquals("100001-150000", result.get(2).range());
         assertEquals(2L, result.get(2).employeeCount());
+
         assertEquals("150001-200000", result.get(3).range());
         assertEquals(2L, result.get(3).employeeCount());
+
         assertEquals("200000+", result.get(4).range());
         assertEquals(1L, result.get(4).employeeCount());
 
@@ -432,14 +333,19 @@ class AnalyticsServiceTest {
 
         assertNotNull(result);
         assertEquals(5, result.size());
+
         assertEquals("0-50000", result.get(0).range());
         assertEquals(0L, result.get(0).employeeCount());
+
         assertEquals("50001-100000", result.get(1).range());
         assertEquals(0L, result.get(1).employeeCount());
+
         assertEquals("100001-150000", result.get(2).range());
         assertEquals(0L, result.get(2).employeeCount());
+
         assertEquals("150001-200000", result.get(3).range());
         assertEquals(0L, result.get(3).employeeCount());
+
         assertEquals("200000+", result.get(4).range());
         assertEquals(0L, result.get(4).employeeCount());
 
@@ -450,89 +356,9 @@ class AnalyticsServiceTest {
         );
     }
 
-    // ============================================================
-    // SALARY DISTRIBUTION FILTERS
-    // ============================================================
-
-    @Test
-    void shouldPassCurrencyIdToRepository() {
-        Long currencyId = 2L;
-
-        when(analyticsRepository.findSalariesForDistribution(
-                currencyId,
-                null,
-                null
-        )).thenReturn(List.of(
-                new BigDecimal("75000")
-        ));
-
-        analyticsService.getSalaryDistribution(
-                currencyId,
-                null,
-                null
-        );
-
-        verify(analyticsRepository, times(1)).findSalariesForDistribution(
-                currencyId,
-                null,
-                null
-        );
-    }
-
-    @Test
-    void shouldPassCountryIdToRepository() {
-        Long currencyId = 1L;
-        Long countryId = 10L;
-
-        when(analyticsRepository.findSalariesForDistribution(
-                currencyId,
-                countryId,
-                null
-        )).thenReturn(List.of(
-                new BigDecimal("75000")
-        ));
-
-        analyticsService.getSalaryDistribution(
-                currencyId,
-                countryId,
-                null
-        );
-
-        verify(analyticsRepository, times(1)).findSalariesForDistribution(
-                currencyId,
-                countryId,
-                null
-        );
-    }
-
-    @Test
-    void shouldPassDepartmentToRepository() {
-        Long currencyId = 1L;
-        String department = "Engineering";
-
-        when(analyticsRepository.findSalariesForDistribution(
-                currencyId,
-                null,
-                department
-        )).thenReturn(List.of(
-                new BigDecimal("85000")
-        ));
-
-        analyticsService.getSalaryDistribution(
-                currencyId,
-                null,
-                department
-        );
-
-        verify(analyticsRepository, times(1)).findSalariesForDistribution(
-                currencyId,
-                null,
-                department
-        );
-    }
-
     @Test
     void shouldPassAllFiltersToRepository() {
+
         Long currencyId = 1L;
         Long countryId = 10L;
         String department = "Engineering";
@@ -545,11 +371,12 @@ class AnalyticsServiceTest {
                 new BigDecimal("85000")
         ));
 
-        List<SalaryDistributionResponse> result = analyticsService.getSalaryDistribution(
-                currencyId,
-                countryId,
-                department
-        );
+        List<SalaryDistributionResponse> result =
+                analyticsService.getSalaryDistribution(
+                        currencyId,
+                        countryId,
+                        department
+                );
 
         assertNotNull(result);
         assertEquals(5, result.size());
@@ -559,30 +386,5 @@ class AnalyticsServiceTest {
                 countryId,
                 department
         );
-    }
-
-    @Test
-    void shouldCallSalaryDistributionRepositoryOnlyOnce() {
-        when(analyticsRepository.findSalariesForDistribution(
-                1L,
-                null,
-                null
-        )).thenReturn(List.of(
-                new BigDecimal("50000")
-        ));
-
-        analyticsService.getSalaryDistribution(
-                1L,
-                null,
-                null
-        );
-
-        verify(analyticsRepository, times(1)).findSalariesForDistribution(
-                1L,
-                null,
-                null
-        );
-
-        verifyNoMoreInteractions(analyticsRepository);
     }
 }

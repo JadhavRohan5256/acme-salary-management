@@ -17,17 +17,17 @@ public class CurrencyService {
 
     public List<CurrencyResponse> getAllCurrencies() {
         return currencyRepository.findAll()
-                .stream()
-                .map(this::toCurrencyResponse)
-                .toList();
+            .stream()
+            .map(this::toCurrencyResponse)
+            .toList();
     }
 
     private CurrencyResponse toCurrencyResponse(Currency currency) {
         return new CurrencyResponse(
-                currency.getId(),
-                currency.getCode(),
-                currency.getName(),
-                currency.getSymbol()
+            currency.getId(),
+            currency.getCode(),
+            currency.getName(),
+            currency.getSymbol()
         );
     }
 }

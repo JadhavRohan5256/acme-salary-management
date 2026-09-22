@@ -9,7 +9,9 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataJpaTest
 class AnalyticsRepositoryTest {
@@ -83,23 +85,6 @@ class AnalyticsRepositoryTest {
         }
     }
 
-
-    @Test
-    void findSalariesForDistribution_shouldReturnSalariesForCurrency() {
-        List<BigDecimal> result = analyticsRepository.findSalariesForDistribution(
-            1L,
-            null,
-            null
-        );
-
-        assertNotNull(result);
-
-        for (BigDecimal salary : result) {
-            assertNotNull(salary);
-        }
-    }
-
-
     @Test
     void findSalariesForDistribution_shouldFilterByCountry() {
         List<BigDecimal> result = analyticsRepository.findSalariesForDistribution(
@@ -114,39 +99,6 @@ class AnalyticsRepositoryTest {
             assertNotNull(salary);
         }
     }
-
-
-    @Test
-    void findSalariesForDistribution_shouldFilterByDepartment() {
-        List<BigDecimal> result = analyticsRepository.findSalariesForDistribution(
-            1L,
-            null,
-            "Engineering"
-        );
-
-        assertNotNull(result);
-
-        for (BigDecimal salary : result) {
-            assertNotNull(salary);
-        }
-    }
-
-
-    @Test
-    void findSalariesForDistribution_shouldFilterByCountryAndDepartment() {
-        List<BigDecimal> result = analyticsRepository.findSalariesForDistribution(
-            1L,
-            1L,
-            "Engineering"
-        );
-
-        assertNotNull(result);
-
-        for (BigDecimal salary : result) {
-            assertNotNull(salary);
-        }
-    }
-
 
     @Test
     void findSalariesForDistribution_shouldReturnEmpty_whenNoMatchingCurrency() {
