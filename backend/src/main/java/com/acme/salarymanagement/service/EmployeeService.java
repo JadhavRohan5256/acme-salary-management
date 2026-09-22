@@ -5,9 +5,20 @@ import com.acme.salarymanagement.dto.currency.CurrencyResponse;
 import com.acme.salarymanagement.dto.employee.EmployeeDetailResponse;
 import com.acme.salarymanagement.dto.employee.EmployeePageResponse;
 import com.acme.salarymanagement.dto.employee.EmployeeResponse;
+import com.acme.salarymanagement.dto.employee.SalaryHistoryResponse;
+import com.acme.salarymanagement.dto.employee.SalaryUpdateRequest;
+import com.acme.salarymanagement.dto.employee.SalaryUpdateResponse;
+import com.acme.salarymanagement.entity.Currency;
 import com.acme.salarymanagement.entity.Employee;
+import com.acme.salarymanagement.entity.SalaryHistory;
+import com.acme.salarymanagement.entity.User;
+import com.acme.salarymanagement.repository.CurrencyRepository;
 import com.acme.salarymanagement.repository.EmployeeRepository;
 import com.acme.salarymanagement.repository.EmployeeSpecification;
+import com.acme.salarymanagement.repository.SalaryHistoryRepository;
+import com.acme.salarymanagement.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
 
 import lombok.RequiredArgsConstructor;
 
@@ -15,11 +26,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-
 import org.springframework.data.jpa.domain.Specification;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -30,6 +44,9 @@ public class EmployeeService {
     private static final int MAX_SIZE = 100;
 
     private final EmployeeRepository employeeRepository;
+    private final CurrencyRepository currencyRepository;
+    private final SalaryHistoryRepository salaryHistoryRepository;
+    private final UserRepository userRepository;
 
     public EmployeePageResponse getEmployees(
             int page,
@@ -171,5 +188,114 @@ public class EmployeeService {
                 employee.getCreatedAt(),
                 employee.getUpdatedAt()
         );
+    }
+    
+    public List<SalaryHistoryResponse> getSalaryHistory(Long employeeId) {
+
+        if (!employeeRepository.existsById(employeeId)) {
+            throw new RuntimeException(
+                    "Employee not found: " + employeeId
+            );
+        }
+
+        return salaryHistoryRepository
+                .findByEmployeeIdOrderByEffectiveDateDescIdDesc(employeeId)
+                .stream()
+                .map(history -> new SalaryHistoryResponse(
+                        history.getId(),
+                        history.getPreviousSalary(),
+                        history.getNewSalary(),
+                        new CurrencyResponse(
+                                history.getCurrency().getId(),
+                                history.getCurrency().getCode(),
+                                history.getCurrency().getName(),
+                                history.getCurrency().getSymbol()
+                        ),
+                        history.getEffectiveDate(),
+                        history.getChangedBy().getUsername(),
+                        history.getCreatedAt()
+                ))
+                .toList();
+    }
+    
+    @Transactional
+    public SalaryUpdateResponse updateSalary(
+            Long employeeId,
+            SalaryUpdateRequest request
+    ) {
+
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Employee not found: " + employeeId
+                        )
+                );
+
+        Currency currency = currencyRepository.findById(request.currencyId())
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Currency not found: " + request.currencyId()
+                        )
+                );
+
+        User currentUser = getCurrentUser();
+
+        BigDecimal previousSalary = employee.getCurrentSalary();
+
+        employee.setCurrentSalary(request.newSalary());
+        employee.setCurrency(currency);
+
+        employeeRepository.save(employee);
+
+        SalaryHistory salaryHistory = SalaryHistory.builder()
+                .employee(employee)
+                .previousSalary(previousSalary)
+                .newSalary(request.newSalary())
+                .currency(currency)
+                .effectiveDate(request.effectiveDate())
+                .changedBy(currentUser)
+                .build();
+
+        salaryHistoryRepository.save(salaryHistory);
+
+        return new SalaryUpdateResponse(
+                employee.getId(),
+                previousSalary,
+                employee.getCurrentSalary(),
+                new CurrencyResponse(
+                        currency.getId(),
+                        currency.getCode(),
+                        currency.getName(),
+                        currency.getSymbol()
+                ),
+                request.effectiveDate(),
+                currentUser.getUsername(),
+                salaryHistory.getCreatedAt()
+        );
+    }
+    
+    private User getCurrentUser() {
+
+        Authentication authentication =
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication();
+
+        if (authentication == null ||
+                !authentication.isAuthenticated()) {
+
+            throw new RuntimeException(
+                    "User is not authenticated"
+            );
+        }
+
+        String username = authentication.getName();
+
+        return userRepository.findByUsername(username)
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Authenticated user not found: " + username
+                        )
+                );
     }
 }

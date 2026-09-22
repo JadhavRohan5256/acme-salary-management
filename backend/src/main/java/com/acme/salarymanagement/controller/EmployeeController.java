@@ -2,9 +2,14 @@ package com.acme.salarymanagement.controller;
 
 import com.acme.salarymanagement.dto.employee.EmployeeDetailResponse;
 import com.acme.salarymanagement.dto.employee.EmployeePageResponse;
+import com.acme.salarymanagement.dto.employee.SalaryHistoryResponse;
+import com.acme.salarymanagement.dto.employee.SalaryUpdateRequest;
+import com.acme.salarymanagement.dto.employee.SalaryUpdateResponse;
 import com.acme.salarymanagement.service.EmployeeService;
 
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 
@@ -52,5 +57,24 @@ public class EmployeeController {
     @GetMapping("/{employeeId}")
     public ResponseEntity<EmployeeDetailResponse> getEmployeeById(@PathVariable Long employeeId) {
         return ResponseEntity.ok(employeeService.getEmployeeById(employeeId));
+    }
+    
+    @GetMapping("/{employeeId}/salary-history")
+    public ResponseEntity<List<SalaryHistoryResponse>> getSalaryHistory(
+            @PathVariable Long employeeId
+    ) {
+        return ResponseEntity.ok(
+                employeeService.getSalaryHistory(employeeId)
+        );
+    }
+
+    @PutMapping("/{employeeId}/salary")
+    public ResponseEntity<SalaryUpdateResponse> updateSalary(
+            @PathVariable Long employeeId,
+            @RequestBody SalaryUpdateRequest request
+    ) {
+        return ResponseEntity.ok(
+                employeeService.updateSalary(employeeId, request)
+        );
     }
 }
