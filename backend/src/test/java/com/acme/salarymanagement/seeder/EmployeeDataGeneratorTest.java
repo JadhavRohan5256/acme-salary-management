@@ -57,7 +57,6 @@ class EmployeeDataGeneratorTest {
             assertNotNull(employee.designation());
             assertNotNull(employee.salary());
             assertNotNull(employee.currencyCode());
-
             assertTrue(employee.salary().signum() > 0);
         });
     }
