@@ -47,7 +47,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.argThat;
 
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -58,22 +57,16 @@ import static org.mockito.Mockito.when;
 class EmployeeServiceTest {
     @Mock
     private EmployeeRepository employeeRepository;
-
     @Mock
     private CurrencyRepository currencyRepository;
-
     @Mock
     private SalaryHistoryRepository salaryHistoryRepository;
-
     @Mock
     private UserRepository userRepository;
-
     @Mock
     private Authentication authentication;
-
     @Mock
     private SecurityContext securityContext;
-
     @InjectMocks
     private EmployeeService employeeService;
 
@@ -90,23 +83,15 @@ class EmployeeServiceTest {
                 .build();
 
         inrCurrency = Currency.builder()
-
                 .code("INR")
-
                 .name("Indian Rupee")
-
                 .symbol("₹")
-
                 .build();
 
         usdCurrency = Currency.builder()
-
                 .code("USD")
-
                 .name("US Dollar")
-
                 .symbol("$")
-
                 .build();
 
         user = new User();
@@ -171,12 +156,10 @@ class EmployeeServiceTest {
         EmployeeDetailResponse response = employeeService.getEmployeeById(1L);
 
         assertNotNull(response);
-
         assertEquals(1L, response.id());
         assertEquals("John", response.firstName());
         assertEquals("Smith", response.lastName());
         assertEquals("john.smith@acme.example", response.email());
-
         assertEquals("India", response.country().name());
         assertEquals("INR", response.currency().code());
         assertEquals(new BigDecimal("120000.00"),response.currentSalary());
@@ -258,135 +241,52 @@ class EmployeeServiceTest {
                 LocalDate.of(2026, 9, 22)
         );
 
-        when(employeeRepository.findById(1L))
-                .thenReturn(Optional.of(employee));
+        when(employeeRepository.findById(1L)).thenReturn(Optional.of(employee));
+        when(currencyRepository.findById(2L)).thenReturn(Optional.of(newCurrency));
+        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(user));
+        when(employeeRepository.save(any(Employee.class))).thenReturn(employee);
+        when(salaryHistoryRepository.save(any(SalaryHistory.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        when(currencyRepository.findById(2L))
-                .thenReturn(Optional.of(newCurrency));
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                "admin",
+                null,
+                List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
+        );
 
-        when(userRepository.findByUsername("admin"))
-                .thenReturn(Optional.of(user));
-
-        when(employeeRepository.save(any(Employee.class)))
-                .thenReturn(employee);
-
-        when(salaryHistoryRepository.save(any(SalaryHistory.class)))
-                .thenAnswer(invocation -> invocation.getArgument(0));
-
-        Authentication authentication =
-        		new UsernamePasswordAuthenticationToken(
-        		        "admin",
-        		        null,
-        		        List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))
-        		);
-
-        SecurityContextHolder.getContext()
-                .setAuthentication(authentication);
-
-        SalaryUpdateResponse response =
-                employeeService.updateSalary(1L, request);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        SalaryUpdateResponse response = employeeService.updateSalary(1L, request);
 
         assertNotNull(response);
-
         assertEquals(1L, response.employeeId());
 
-        assertEquals(
-                new BigDecimal("50000.00"),
-                response.previousSalary()
-        );
+        assertEquals(new BigDecimal("50000.00"), response.previousSalary());
+        assertEquals(new BigDecimal("60000.00"), response.newSalary());
+        assertEquals(newCurrency.getId(), response.currency().id());
+        assertEquals(newCurrency.getCode(), response.currency().code());
+        assertEquals(newCurrency.getName(), response.currency().name());
+        assertEquals(newCurrency.getSymbol(), response.currency().symbol());
+        assertEquals(LocalDate.of(2026, 9, 22), response.effectiveDate());
+        assertEquals("admin", response.updatedBy());
+        assertEquals(new BigDecimal("60000.00"), employee.getCurrentSalary());
+        assertEquals(newCurrency,employee.getCurrency());
 
-        assertEquals(
-                new BigDecimal("60000.00"),
-                response.newSalary()
-        );
+        ArgumentCaptor<SalaryHistory> salaryHistoryCaptor = ArgumentCaptor.forClass(SalaryHistory.class);
 
-        assertEquals(
-                newCurrency.getId(),
-                response.currency().id()
-        );
+        verify(salaryHistoryRepository).save(salaryHistoryCaptor.capture());
 
-        assertEquals(
-                newCurrency.getCode(),
-                response.currency().code()
-        );
+        SalaryHistory savedHistory = salaryHistoryCaptor.getValue();
 
-        assertEquals(
-                newCurrency.getName(),
-                response.currency().name()
-        );
-
-        assertEquals(
-                newCurrency.getSymbol(),
-                response.currency().symbol()
-        );
-
-        assertEquals(
-                LocalDate.of(2026, 9, 22),
-                response.effectiveDate()
-        );
-
-        assertEquals(
-                "admin",
-                response.updatedBy()
-        );
-
-        assertEquals(
-                new BigDecimal("60000.00"),
-                employee.getCurrentSalary()
-        );
-
-        assertEquals(
-                newCurrency,
-                employee.getCurrency()
-        );
-
-        ArgumentCaptor<SalaryHistory> salaryHistoryCaptor =
-                ArgumentCaptor.forClass(SalaryHistory.class);
-
-        verify(salaryHistoryRepository)
-                .save(salaryHistoryCaptor.capture());
-
-        SalaryHistory savedHistory =
-                salaryHistoryCaptor.getValue();
-
-        assertEquals(
-                employee,
-                savedHistory.getEmployee()
-        );
-
-        assertEquals(
-                new BigDecimal("50000.00"),
-                savedHistory.getPreviousSalary()
-        );
-
-        assertEquals(
-                new BigDecimal("60000.00"),
-                savedHistory.getNewSalary()
-        );
-
-        assertEquals(
-                newCurrency,
-                savedHistory.getCurrency()
-        );
-
-        assertEquals(
-                LocalDate.of(2026, 9, 22),
-                savedHistory.getEffectiveDate()
-        );
-
-        assertEquals(
-                user,
-                savedHistory.getChangedBy()
-        );
+        assertEquals(employee, savedHistory.getEmployee());
+        assertEquals(new BigDecimal("50000.00"), savedHistory.getPreviousSalary());
+        assertEquals(new BigDecimal("60000.00"), savedHistory.getNewSalary());
+        assertEquals(newCurrency, savedHistory.getCurrency());
+        assertEquals(LocalDate.of(2026, 9, 22), savedHistory.getEffectiveDate());
+        assertEquals(user, savedHistory.getChangedBy());
 
         verify(employeeRepository).findById(1L);
-
         verify(currencyRepository).findById(2L);
-
         verify(userRepository).findByUsername("admin");
-
         verify(employeeRepository).save(employee);
-
         verify(salaryHistoryRepository).save(any(SalaryHistory.class));
     }
 
