@@ -1,9 +1,32 @@
 import { createReducer, on } from '@ngrx/store';
-import { initialAuthState } from './auth.state';
+import { AuthState, initialAuthState } from './auth.state';
 import { login, loginSuccess, loginFailure, logout } from './auth.actions';
 
+
+const getInitialAuthState = (): AuthState => {
+  const token = localStorage.getItem('acme_access_token');
+  const userJson = localStorage.getItem('acme_user');
+  let user = null;
+
+  if (userJson) {
+    try {
+      user = JSON.parse(userJson);
+    } catch {
+      user = null;
+    }
+  }
+
+  return {
+    token,
+    user,
+    loading: false,
+    error: null
+  };
+};
+
+
 export const authReducer = createReducer(
-  initialAuthState,
+  getInitialAuthState(),
 
   on(login, state => ({
     ...state,
