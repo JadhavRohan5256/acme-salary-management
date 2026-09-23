@@ -11,6 +11,8 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { authReducer } from './store/auth/auth.reducer';
 import { AuthEffects } from './store/auth/auth.effects';
+import { employeeReducer } from './store/employees/employee.reducer';
+import { EmployeeEffects } from './store/employees/employee.effects';
 
 @NgModule({
   declarations: [
@@ -23,9 +25,13 @@ import { AuthEffects } from './store/auth/auth.effects';
     AppRoutingModule,
     CoreModule,
     StoreModule.forRoot({
-      auth: authReducer
+      auth: authReducer,
+      employees: employeeReducer
     }),
-    EffectsModule.forRoot([AuthEffects])
+    EffectsModule.forRoot([
+      AuthEffects,
+      EmployeeEffects
+    ])
   ],
   providers: [
     provideAnimationsAsync()
