@@ -7,6 +7,9 @@ import { loadEmployees } from '../../../store/employees/employee.actions';
 import { selectEmployees, selectEmployeesLoading, selectEmployeesError } from '../../../store/employees/employee.selectors';
 import { PageResponse } from '../../../core/models/page';
 import { Employee } from '../../../core/models/employee';
+import { selectCountries, selectCountriesLoading } from '../../../store/reference-data/reference-data.selectors';
+import { Country } from '../../../core/models/country';
+import { loadCountries, loadCurrencies } from '../../../store/reference-data/reference-data.actions';
 
 @Component({
   selector: 'app-employee-list',
@@ -16,6 +19,8 @@ import { Employee } from '../../../core/models/employee';
 export class EmployeeListComponent implements OnInit {
   employees$: Observable<PageResponse<Employee> | null>;
   loading$: Observable<boolean>;
+  countriesLoading$: Observable<boolean>;
+  countries$: Observable<Country[]>;
   error$: Observable<string | null>;
   filterForm!: FormGroup;
   displayedColumns: string[] = [
@@ -35,9 +40,12 @@ export class EmployeeListComponent implements OnInit {
     this.employees$ = this.store.select(selectEmployees);
     this.loading$ = this.store.select(selectEmployeesLoading);
     this.error$ = this.store.select(selectEmployeesError);
+    this.countries$ = this.store.select(selectCountries); 
+    this.countriesLoading$ = this.store.select(selectCountriesLoading);
   }
 
   ngOnInit(): void {
+    this.store.dispatch(loadCountries());
     this.initializeFormGroup();
     this.loadEmployees();
   }
@@ -57,10 +65,8 @@ export class EmployeeListComponent implements OnInit {
         page: 0,
         size: 20,
         search: search || undefined,
-        countryId:
-          countryId || undefined,
-        department:
-          department || undefined
+        countryId: countryId || undefined,
+        department: department || undefined
       }
     }
 
@@ -84,10 +90,8 @@ export class EmployeeListComponent implements OnInit {
         page: event.pageIndex,
         size: event.pageSize,
         search: search || undefined,
-        countryId:
-          countryId || undefined,
-        department:
-          department || undefined
+        countryId: countryId || undefined,
+        department: department || undefined
       }
     }
 
