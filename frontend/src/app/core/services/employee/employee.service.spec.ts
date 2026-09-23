@@ -172,10 +172,8 @@ describe('EmployeeService', () => {
         req.params.get('size') === '50' &&
         req.params.get('search') === 'john' &&
         req.params.get('countryId') === '1' &&
-        req.params.get('department') ===
-          'Engineering' &&
-        req.params.get('sort') ===
-          'lastName,asc'
+        req.params.get('department') === 'Engineering' &&
+        req.params.get('sort') === 'lastName,asc'
     );
 
     expect(request.request.method).toBe('GET');

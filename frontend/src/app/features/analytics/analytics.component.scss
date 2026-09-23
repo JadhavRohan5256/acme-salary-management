@@ -1,0 +1,167 @@
+.analytics-page {
+  padding: 24px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 4px 0 0;
+    opacity: 0.7;
+  }
+}
+
+.overview-section {
+  margin-bottom: 24px;
+}
+
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.overview-card {
+  mat-card-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-height: 100px;
+  }
+}
+
+.card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.06);
+
+  mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+}
+
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-label {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+.card-value {
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.analytics-section {
+  margin-bottom: 24px;
+}
+
+.analytics-content {
+  width: 100%;
+}
+
+.tab-content {
+  padding-top: 20px;
+}
+
+.analytics-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.analytics-summary > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.analytics-summary mat-icon {
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+}
+
+.record-count {
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+}
+
+th {
+  font-weight: 600;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 32px;
+}
+
+.error-message {
+  padding: 12px 16px;
+  margin-bottom: 16px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 32px;
+  opacity: 0.7;
+}
+
+@media (max-width: 900px) {
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .analytics-page {
+    padding: 16px;
+  }
+
+  .page-header {
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 768px) {
+  .analytics-summary {
+    align-items: flex-start;
+    gap: 10px;
+    flex-direction: column;
+  }
+
+  .tab-content {
+    padding-top: 16px;
+  }
+}

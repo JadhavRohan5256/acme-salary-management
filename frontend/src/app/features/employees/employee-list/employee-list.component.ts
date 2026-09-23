@@ -9,7 +9,8 @@ import { PageResponse } from '../../../core/models/page';
 import { Employee } from '../../../core/models/employee';
 import { selectCountries, selectCountriesLoading } from '../../../store/reference-data/reference-data.selectors';
 import { Country } from '../../../core/models/country';
-import { loadCountries, loadCurrencies } from '../../../store/reference-data/reference-data.actions';
+import { loadCountries } from '../../../store/reference-data/reference-data.actions';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-employee-list',
@@ -35,7 +36,8 @@ export class EmployeeListComponent implements OnInit {
 
   constructor(
     private readonly store: Store,
-    private readonly fb: FormBuilder
+    private readonly fb: FormBuilder,
+    private readonly router: Router
   ) {
     this.employees$ = this.store.select(selectEmployees);
     this.loading$ = this.store.select(selectEmployeesLoading);
@@ -101,5 +103,9 @@ export class EmployeeListComponent implements OnInit {
 
   handleFormSubmit(): void {
     this.loadEmployees();
+  }
+
+  goBack(): void {
+    this.router.navigate(['/dashboard']);
   }
 }
