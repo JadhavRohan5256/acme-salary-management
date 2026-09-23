@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
 
 const routes: Routes = [
   {
@@ -7,8 +8,6 @@ const routes: Routes = [
     loadChildren: () => import('./features/auth/login/login.module').then(m => m.LoginModule)
   },
   {
-<<<<<<< Updated upstream
-=======
     path: 'dashboard',
     canActivate: [authGuard],
     loadChildren: () => import('./features/dashboard/dashboard.module').then(m => m.DashboardModule)
@@ -19,7 +18,6 @@ const routes: Routes = [
     loadChildren: () => import('./features/employees/employees.module').then(m => m.EmployeesModule)
   },
   {
->>>>>>> Stashed changes
     path: '',
     redirectTo: 'login',
     pathMatch: 'full'
