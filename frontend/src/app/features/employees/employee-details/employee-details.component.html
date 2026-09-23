@@ -57,7 +57,20 @@
                     </span>
                 </div>
             </div>
+            <div class="salary-action">
+                <button
+                    mat-raised-button 
+                    color="primary"
+                    [routerLink]="['/employees', employee.id, 'update-salary']"
+                >
+                    Update Salary
+                </button>
+            </div>
         </mat-card-content>
+        <app-salary-history
+            *ngIf="employee"
+            [employeeId]="employee.id">
+        </app-salary-history>
     </mat-card>
     <div *ngIf="!(loading$ | async) && (error$ | async) as error" class="error-message">
         {{ error }}

@@ -11,15 +11,23 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 import { EmployeesRoutingModule } from './employees-routing.module';
 import { EmployeeListComponent } from './employee-list/employee-list.component';
 import { EmployeeDetailsComponent } from './employee-details/employee-details.component';
+import { SalaryHistoryComponent } from './salary-history/salary-history.component';
+import { UpdateSalaryComponent } from './update-salary/update-salary.component';
+import { UpdateSalaryPageComponent } from './update-salary-page/update-salary-page.component';
 
 @NgModule({
   declarations: [
     EmployeeListComponent,
-    EmployeeDetailsComponent
+    EmployeeDetailsComponent,
+    SalaryHistoryComponent,
+    UpdateSalaryComponent,
+    UpdateSalaryPageComponent
   ],
   imports: [
     CommonModule,
@@ -34,6 +42,8 @@ import { EmployeeDetailsComponent } from './employee-details/employee-details.co
     MatProgressSpinnerModule,
     MatCardModule,
     MatIconModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
     EmployeesRoutingModule
   ]
 })

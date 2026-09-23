@@ -3,25 +3,20 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 
-import {
-  selectSelectedEmployee,
-  selectSelectedEmployeeLoading,
-  selectSelectedEmployeeError
-} from '../../../store/employees/employee.selectors';
-import { Employee } from '../../../core/models/employee';
 import { loadEmployee } from '../../../store/employees/employee.actions';
+import { selectSelectedEmployee, selectSelectedEmployeeLoading, selectSelectedEmployeeError } from '../../../store/employees/employee.selectors';
+import { Employee } from '../../../core/models/employee';
 import { loadCurrencies } from '../../../store/reference-data/reference-data.actions';
 
 @Component({
-  selector: 'app-employee-details',
-  templateUrl: './employee-details.component.html',
-  styleUrls: ['./employee-details.component.scss']
+  selector: 'app-update-salary-page',
+  templateUrl: './update-salary-page.component.html',
+  styleUrls: ['./update-salary-page.component.scss']
 })
-export class EmployeeDetailsComponent implements OnInit {
+export class UpdateSalaryPageComponent implements OnInit {
   employee$: Observable<Employee | null>;
   loading$: Observable<boolean>;
   error$: Observable<string | null>;
-
   employeeId!: number;
 
   constructor(
@@ -42,13 +37,11 @@ export class EmployeeDetailsComponent implements OnInit {
       return;
     }
 
-    this.store.dispatch(
-      loadEmployee({ employeeId: this.employeeId })
-    );
+    this.store.dispatch(loadEmployee({ employeeId: this.employeeId }));
     this.store.dispatch(loadCurrencies());
   }
 
   goBack(): void {
-    this.router.navigate(['/employees']);
+    this.router.navigate(['/employees', this.employeeId]);
   }
 }

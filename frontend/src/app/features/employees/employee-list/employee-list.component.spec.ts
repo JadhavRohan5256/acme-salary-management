@@ -8,6 +8,18 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MockStore, provideMockStore } from '@ngrx/store/testing';
 import { selectEmployees, selectEmployeesError, selectEmployeesLoading } from '../../../store/employees/employee.selectors';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { loadCountries } from '../../../store/reference-data/reference-data.actions';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { selectCountries, selectCountriesLoading } from '../../../store/reference-data/reference-data.selectors';
 
 describe('EmployeeListComponent', () => {
   let component: EmployeeListComponent;
@@ -51,6 +63,16 @@ describe('EmployeeListComponent', () => {
       imports: [
         NoopAnimationsModule,
         ReactiveFormsModule,
+        MatTableModule,
+        MatPaginatorModule,
+        MatSortModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatSelectModule,
+        MatButtonModule,
+        MatProgressSpinnerModule,
+        MatCardModule,
+        MatIconModule,
       ],
       providers: [
         provideMockStore({
@@ -66,6 +88,14 @@ describe('EmployeeListComponent', () => {
             {
               selector: selectEmployeesError,
               value: null
+            },
+            {
+              selector: selectCountries,
+              value: []
+            },
+            {
+              selector: selectCountriesLoading,
+              value: false
             }
           ]
         })
@@ -243,8 +273,7 @@ describe('EmployeeListComponent', () => {
 
     expect(store.dispatch).toHaveBeenCalledTimes(1);
 
-    const dispatchedAction = dispatchSpy.calls.mostRecent()
-      .args[0] as ReturnType<typeof loadEmployees>;
+    const dispatchedAction = dispatchSpy.calls.mostRecent().args[0] as ReturnType<typeof loadEmployees>;
 
     expect(dispatchedAction.query.page).toBe(1);
     expect(dispatchedAction.query.size).toBe(10);
@@ -272,5 +301,47 @@ describe('EmployeeListComponent', () => {
       expect(error).toBeNull();
       done();
     });
+  });
+
+  it('should load countries on initialization', () => {
+    expect(store.dispatch).toHaveBeenCalledWith(loadCountries());
+  });
+
+  it('should expose countries observable', (done) => {
+    component.countries$.subscribe(countries => {
+      expect(countries).toEqual([]);
+      done();
+    });
+  });
+
+  it('should expose countries loading observable', (done) => {
+    component.countriesLoading$.subscribe(loading => {
+      expect(loading).toBeFalse();
+      done();
+    });
+  });
+
+  it('should dispatch employee search with selected country', () => {
+    dispatchSpy.calls.reset();
+
+    component.filterForm.patchValue({
+      search: '',
+      countryId: 1,
+      department: ''
+    });
+
+    component.loadEmployees();
+
+    expect(store.dispatch).toHaveBeenCalledWith(
+      loadEmployees({
+        query: {
+          page: 0,
+          size: 20,
+          search: undefined,
+          countryId: 1,
+          department: undefined
+        }
+      })
+    );
   });
 });
