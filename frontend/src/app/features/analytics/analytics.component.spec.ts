@@ -1,172 +1,148 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
-import { Store } from '@ngrx/store';
-import { of } from 'rxjs';
+import { Router } from '@angular/router';
+import { provideMockStore, MockStore } from '@ngrx/store/testing';
+import { By } from '@angular/platform-browser';
 
 import { AnalyticsComponent } from './analytics.component';
-import { loadOverview, loadByCountry, loadByDepartment } from '../../store/analytics/analytics.actions';
-
-import {
-  selectOverview,
-  selectByCountry,
-  selectByDepartment,
-  selectOverviewLoading,
-  selectCountryLoading,
-  selectDepartmentLoading,
-  selectOverviewError,
-  selectCountryError,
-  selectDepartmentError
-} from '../../store/analytics/analytics.selectors';
+import { selectOverview, selectOverviewError, selectOverviewLoading } from '../../store/analytics/analytics.selectors';
+import { loadByCountry, loadByDepartment, loadOverview } from '../../store/analytics/analytics.actions';
 
 
 describe('AnalyticsComponent', () => {
   let component: AnalyticsComponent;
   let fixture: ComponentFixture<AnalyticsComponent>;
-  let store: jasmine.SpyObj<Store>;
+  let store: MockStore;
+  let router: jasmine.SpyObj<Router>;
+
+  const initialState = {
+    analytics: {
+      overview: null,
+      byCountry: [],
+      byDepartment: [],
+      salaryDistribution: [],
+      selectedSalaryDistributionQuery: null,
+
+      overviewLoading: false,
+      countryLoading: false,
+      departmentLoading: false,
+      salaryDistributionLoading: false,
+
+      overviewError: null,
+      countryError: null,
+      departmentError: null,
+      salaryDistributionError: null
+    }
+  };
 
   beforeEach(async () => {
-    store = jasmine.createSpyObj<Store>('Store', ['select', 'dispatch']);
-
-    store.select.and.callFake((selector: unknown) => {
-      if (selector === selectOverview) {
-        return of({
-          totalEmployees: 10000,
-          totalCountries: 10,
-          totalDepartments: 8
-        });
-      }
-
-      if (selector === selectByCountry) {
-        return of([]);
-      }
-
-      if (selector === selectByDepartment) {
-        return of([]);
-      }
-
-      if (selector === selectOverviewLoading) {
-        return of(false);
-      }
-
-      if (selector === selectCountryLoading) {
-        return of(false);
-      }
-
-      if (selector === selectDepartmentLoading) {
-        return of(false);
-      }
-
-      if (selector === selectOverviewError) {
-        return of(null);
-      }
-
-      if (selector === selectCountryError) {
-        return of(null);
-      }
-
-      if (selector === selectDepartmentError) {
-        return of(null);
-      }
-
-      return of(null);
-    });
+    router = jasmine.createSpyObj<Router>('Router', [
+      'navigate'
+    ]);
 
     await TestBed.configureTestingModule({
-      declarations: [AnalyticsComponent],
-      imports: [ReactiveFormsModule],
+      declarations: [ AnalyticsComponent ],
       providers: [
+        provideMockStore({
+          initialState
+        }),
         {
-          provide: Store,
-          useValue: store
+          provide: Router,
+          useValue: router
         }
       ],
-      schemas: [NO_ERRORS_SCHEMA]
+      schemas: [ NO_ERRORS_SCHEMA ]
     }).compileComponents();
+
+    store = TestBed.inject(MockStore);
 
     fixture = TestBed.createComponent(AnalyticsComponent);
     component = fixture.componentInstance;
+
     fixture.detectChanges();
+  });
+
+  afterEach(() => {
+    store.resetSelectors();
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize analytics observables', () => {
-    expect(component.overview$).toBeTruthy();
-    expect(component.countryAnalytics$).toBeTruthy();
-    expect(component.departmentAnalytics$).toBeTruthy();
+  it('should expose overview observable', (done) => {
+    const overview = {
+      totalEmployees: 10000,
+      totalCountries: 8,
+      totalDepartments: 8
+    };
 
-    expect(component.overviewLoading$).toBeTruthy();
-    expect(component.countryLoading$).toBeTruthy();
-    expect(component.departmentLoading$).toBeTruthy();
+    store.overrideSelector(selectOverview, overview);
+    store.refreshState();
 
-    expect(component.overviewError$).toBeTruthy();
-    expect(component.countryError$).toBeTruthy();
-    expect(component.departmentError$).toBeTruthy();
+    component.overview$.subscribe(value => {
+      expect(value).toEqual(overview);
+      done();
+    });
   });
 
-  it('should initialize displayed columns', () => {
-    expect(component.countryDisplayedColumns).toEqual([
-      'country',
-      'employeeCount',
-      'currency',
-      'averageSalary',
-      'minimumSalary',
-      'maximumSalary'
-    ]);
+  it('should expose overview loading state', (done) => {
+    store.overrideSelector(selectOverviewLoading, true);
+    store.refreshState();
 
-    expect(component.departmentDisplayedColumns).toEqual([
-      'department',
-      'employeeCount',
-      'currency',
-      'averageSalary'
-    ]);
+    component.overviewLoading$.subscribe(value => {
+      expect(value).toBeTrue();
+      done();
+    });
   });
 
-  it('should load all analytics on initialization', () => {
-    expect(store.dispatch).toHaveBeenCalledWith(loadOverview());
-    expect(store.dispatch).toHaveBeenCalledWith(loadByCountry());
-    expect(store.dispatch).toHaveBeenCalledWith(loadByDepartment());
+  it('should expose overview error', (done) => {
+    const error = 'Failed to load analytics overview';
+
+    store.overrideSelector(selectOverviewError, error);
+    store.refreshState();
+
+    component.overviewError$.subscribe(value => {
+      expect(value).toBe(error);
+      done();
+    });
   });
 
-  it('should dispatch all analytics actions when refreshing', () => {
-    store.dispatch.calls.reset();
+  it('should dispatch analytics actions on initialization', () => {
+    const dispatchSpy = spyOn(store, 'dispatch');
+
+    component.ngOnInit();
+
+    expect(dispatchSpy).toHaveBeenCalledWith(loadOverview());
+    expect(dispatchSpy).toHaveBeenCalledWith(loadByCountry());
+    expect(dispatchSpy).toHaveBeenCalledWith(loadByDepartment());
+    expect(dispatchSpy).toHaveBeenCalledTimes(3);
+  });
+
+  it('should dispatch analytics actions when refresh is called', () => {
+    const dispatchSpy = spyOn(store, 'dispatch');
 
     component.refresh();
 
-    expect(store.dispatch).toHaveBeenCalledWith(loadOverview());
-    expect(store.dispatch).toHaveBeenCalledWith(loadByCountry());
-    expect(store.dispatch).toHaveBeenCalledWith(loadByDepartment());
+    expect(dispatchSpy).toHaveBeenCalledWith(loadOverview());
+    expect(dispatchSpy).toHaveBeenCalledWith(loadByCountry());
+    expect(dispatchSpy).toHaveBeenCalledWith(loadByDepartment());
+    expect(dispatchSpy).toHaveBeenCalledTimes(3);
   });
 
-  it('should dispatch all analytics actions from loadAnalytics', () => {
-    store.dispatch.calls.reset();
-    component.loadAnalytics();
-    expect(store.dispatch).toHaveBeenCalledTimes(3);
+  it('should navigate back to dashboard', () => {
+    component.goBack();
+
+    expect(router.navigate).toHaveBeenCalledWith([
+      '/dashboard'
+    ]);
   });
 
-  it('should expose overview data', (done) => {
-    component.overview$.subscribe(overview => {
-      expect(overview?.totalEmployees).toBe(10000);
-      expect(overview?.totalCountries).toBe(10);
-      expect(overview?.totalDepartments).toBe(8);
-      done();
-    });
-  });
+  it('should call loadAnalytics from refresh', () => {
+    const loadAnalyticsSpy = spyOn(component, 'loadAnalytics');
 
-  it('should expose country analytics', (done) => {
-    component.countryAnalytics$.subscribe(data => {
-      expect(data).toEqual([]);
-      done();
-    });
-  });
+    component.refresh();
 
-  it('should expose department analytics', (done) => {
-    component.departmentAnalytics$.subscribe(data => {
-      expect(data).toEqual([]);
-      done();
-    });
+    expect(loadAnalyticsSpy).toHaveBeenCalled();
   });
 });
