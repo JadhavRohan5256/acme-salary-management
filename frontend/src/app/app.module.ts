@@ -15,6 +15,8 @@ import { employeeReducer } from './store/employees/employee.reducer';
 import { EmployeeEffects } from './store/employees/employee.effects';
 import { referenceDataReducer } from './store/reference-data/reference-data.reducer';
 import { ReferenceDataEffects } from './store/reference-data/reference-data.effects';
+import { analyticsReducer } from './store/analytics/analytics.reducer';
+import { AnalyticsEffects } from './store/analytics/analytics.effects';
 
 @NgModule({
   declarations: [
@@ -29,12 +31,14 @@ import { ReferenceDataEffects } from './store/reference-data/reference-data.effe
     StoreModule.forRoot({
       auth: authReducer,
       employees: employeeReducer,
-      referenceData: referenceDataReducer
+      referenceData: referenceDataReducer,
+      analytics: analyticsReducer
     }),
     EffectsModule.forRoot([
       AuthEffects,
       EmployeeEffects,
-      ReferenceDataEffects
+      ReferenceDataEffects,
+      AnalyticsEffects
     ])
   ],
   providers: [

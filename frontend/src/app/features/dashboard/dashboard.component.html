@@ -4,18 +4,24 @@
     <span class="spacer"></span>
     <ng-container *ngIf="user$ | async as user">
       <span class="username">{{ user.username }}</span>
-      <button
-        mat-button
-        (click)="logout()"
-      >
+      <button mat-button (click)="logout()">
         Logout
       </button>
     </ng-container>
   </mat-toolbar>
   <main class="content">
+    <div class="actions">
+      <button mat-raised-button color="primary" routerLink="/employees">
+        View Employees
+      </button>
+
+      <button mat-raised-button color="accent" routerLink="/analytics">
+        View Analytics
+      </button>
+    </div>
     <mat-card>
-      <mat-card-title>Dashboard</mat-card-title>
       <mat-card-content>
+        <mat-card-title>Dashboard</mat-card-title>
         <p>Welcome to ACME Salary Management.</p>
         <ng-container *ngIf="user$ | async as user">
           <p>

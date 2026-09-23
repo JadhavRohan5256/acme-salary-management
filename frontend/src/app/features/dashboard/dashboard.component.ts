@@ -2,9 +2,9 @@ import { Component } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
-import { selectUser } from '../../../store/auth/auth.selectors';
-import { logout } from '../../../store/auth/auth.actions';
-import { UserInfo } from '../../../core/models/auth';
+import { selectUser } from '../../store/auth/auth.selectors';
+import { logout } from '../../store/auth/auth.actions';
+import { UserInfo } from '../../core/models/auth';
 
 @Component({
   selector: 'app-dashboard',

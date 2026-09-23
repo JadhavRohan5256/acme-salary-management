@@ -1,0 +1,244 @@
+<div class="analytics-page">
+    <div class="page-header">
+        <button mat-stroked-button type="button" (click)="goBack()">
+            Back to Dashboard
+        </button>
+    </div>
+    <div class="page-header">
+        <div>
+            <h1>Analytics</h1>
+            <p>Salary and workforce overview</p>
+        </div>
+        <button mat-stroked-button color="primary" type="button" (click)="refresh()">
+            <mat-icon>refresh</mat-icon>
+            Refresh
+        </button>
+    </div>
+    <section class="overview-section">
+        <div *ngIf="overviewLoading$ | async" class="loading">
+            <mat-spinner diameter="40"></mat-spinner>
+        </div>
+        <div *ngIf="overviewError$ | async as error" class="error-message">
+            {{ error }}
+        </div>
+        <ng-container *ngIf="overview$ | async as overview">
+            <div class="overview-grid">
+                <mat-card class="overview-card">
+                    <mat-card-content>
+                        <div class="card-icon">
+                            <mat-icon>people</mat-icon>
+                        </div>
+                        <div class="card-content">
+                            <span class="card-label">
+                                Total Employees
+                            </span>
+
+                            <span class="card-value">
+                                {{ overview.totalEmployees | number }}
+                            </span>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+                <mat-card class="overview-card">
+                    <mat-card-content>
+                        <div class="card-icon">
+                            <mat-icon>public</mat-icon>
+                        </div>
+
+                        <div class="card-content">
+                            <span class="card-label">
+                                Total Countries
+                            </span>
+
+                            <span class="card-value">
+                                {{ overview.totalCountries | number }}
+                            </span>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+                <mat-card class="overview-card">
+                    <mat-card-content>
+                        <div class="card-icon">
+                            <mat-icon>business</mat-icon>
+                        </div>
+
+                        <div class="card-content">
+                            <span class="card-label">
+                                Total Departments
+                            </span>
+
+                            <span class="card-value">
+                                {{ overview.totalDepartments | number }}
+                            </span>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+            </div>
+        </ng-container>
+    </section>
+
+    <!-- Analytics Tabs -->
+    <section class="analytics-section">
+
+        <mat-card>
+            <mat-card-header>
+                <mat-card-title>
+                    Workforce Analytics
+                </mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <mat-tab-group>
+                    <mat-tab label="By Country">
+                        <div class="tab-content">
+                            <div *ngIf="countryLoading$ | async" class="loading">
+                                <mat-spinner diameter="40"></mat-spinner>
+                            </div>
+                            <div *ngIf="countryError$ | async as error" class="error-message">
+                                {{ error }}
+                            </div>
+                            <div *ngIf="!(countryLoading$ | async) && !(countryError$ | async)"
+                                class="analytics-content">
+                                <div class="analytics-summary">
+                                    <div>
+                                        <mat-icon>public</mat-icon>
+                                        <span>Employees by Country</span>
+                                    </div>
+                                    <span class="record-count">
+                                        {{ (countryAnalytics$ | async)?.length ?? 0 }}
+                                        records
+                                    </span>
+                                </div>
+                                <div class="table-container">
+                                    <table mat-table [dataSource]="(countryAnalytics$ | async) ?? []">
+                                        <ng-container matColumnDef="country">
+                                            <th mat-header-cell *matHeaderCellDef>
+                                                Country
+                                            </th>
+                                            <td mat-cell *matCellDef="let item">
+                                                {{ item.country.name }}
+                                                ({{ item.country.code }})
+                                            </td>
+                                        </ng-container>
+                                        <ng-container matColumnDef="employeeCount">
+                                            <th mat-header-cell *matHeaderCellDef>
+                                                Employees
+                                            </th>
+                                            <td mat-cell *matCellDef="let item">
+                                                {{ item.employeeCount | number }}
+                                            </td>
+                                        </ng-container>
+                                        <ng-container matColumnDef="currency">
+                                            <th mat-header-cell *matHeaderCellDef>
+                                                Currency
+                                            </th>
+                                            <td mat-cell *matCellDef="let item">
+                                                {{ item.currency.code }}
+                                            </td>
+                                        </ng-container>
+                                        <ng-container matColumnDef="averageSalary">
+                                            <th mat-header-cell *matHeaderCellDef>
+                                                Average Salary
+                                            </th>
+                                            <td mat-cell *matCellDef="let item">
+                                                {{ item.currency.symbol }}
+                                                {{ item.averageSalary | number:'1.0-2' }}
+                                            </td>
+                                        </ng-container>
+                                        <ng-container matColumnDef="minimumSalary">
+                                            <th mat-header-cell *matHeaderCellDef>
+                                                Minimum Salary
+                                            </th>
+                                            <td mat-cell *matCellDef="let item">
+                                                {{ item.currency.symbol }}
+                                                {{ item.minimumSalary | number:'1.0-2' }}
+                                            </td>
+                                        </ng-container>
+                                        <ng-container matColumnDef="maximumSalary">
+                                            <th mat-header-cell *matHeaderCellDef>
+                                                Maximum Salary
+                                            </th>
+                                            <td mat-cell *matCellDef="let item">
+                                                {{ item.currency.symbol }}
+                                                {{ item.maximumSalary | number:'1.0-2' }}
+                                            </td>
+                                        </ng-container>
+                                        <tr mat-header-row *matHeaderRowDef="countryDisplayedColumns"></tr>
+                                        <tr mat-row *matRowDef="let row; columns: countryDisplayedColumns"></tr>
+                                    </table>
+                                </div>
+                                <div *ngIf="(countryAnalytics$ | async)?.length === 0" class="empty-state">
+                                    No country analytics available.
+                                </div>
+                            </div>
+                        </div>
+                    </mat-tab>
+                    <mat-tab label="By Department">
+                        <div class="tab-content">
+                            <div *ngIf="departmentLoading$ | async" class="loading">
+                                <mat-spinner diameter="40"></mat-spinner>
+                            </div>
+                            <div *ngIf="departmentError$ | async as error" class="error-message">
+                                {{ error }}
+                            </div>
+                            <div *ngIf="!(departmentLoading$ | async) && !(departmentError$ | async)"
+                                class="analytics-content">
+                                <div class="analytics-summary">
+                                    <div>
+                                        <mat-icon>business</mat-icon>
+                                        <span>Employees by Department</span>
+                                    </div>
+                                    <span class="record-count">
+                                        {{ (departmentAnalytics$ | async)?.length ?? 0 }}
+                                        records
+                                    </span>
+                                </div>
+                                <div class="table-container">
+                                    <table mat-table [dataSource]="(departmentAnalytics$ | async) ?? []">
+                                        <ng-container matColumnDef="department">
+                                            <th mat-header-cell *matHeaderCellDef>
+                                                Department
+                                            </th>
+                                            <td mat-cell *matCellDef="let item">
+                                                {{ item.department }}
+                                            </td>
+                                        </ng-container>
+                                        <ng-container matColumnDef="employeeCount">
+                                            <th mat-header-cell *matHeaderCellDef>
+                                                Employees
+                                            </th>
+                                            <td mat-cell *matCellDef="let item">
+                                                {{ item.employeeCount | number }}
+                                            </td>
+                                        </ng-container>
+                                        <ng-container matColumnDef="currency">
+                                            <th mat-header-cell *matHeaderCellDef>
+                                                Currency
+                                            </th>
+                                            <td mat-cell *matCellDef="let item">
+                                                {{ item.currency.code }}
+                                            </td>
+                                        </ng-container>
+                                        <ng-container matColumnDef="averageSalary">
+                                            <th mat-header-cell *matHeaderCellDef>
+                                                Average Salary
+                                            </th>
+                                            <td mat-cell *matCellDef="let item">
+                                                {{ item.currency.symbol }}
+                                                {{ item.averageSalary | number:'1.0-2' }}
+                                            </td>
+                                        </ng-container>
+                                        <tr mat-header-row *matHeaderRowDef="departmentDisplayedColumns"></tr>
+                                        <tr mat-row *matRowDef="let row; columns: departmentDisplayedColumns"></tr>
+                                    </table>
+                                </div>
+                                <div *ngIf="(departmentAnalytics$ | async)?.length === 0" class="empty-state">
+                                    No department analytics available.
+                                </div>
+                            </div>
+                        </div>
+                    </mat-tab>
+                </mat-tab-group>
+            </mat-card-content>
+        </mat-card>
+    </section>
+</div>
