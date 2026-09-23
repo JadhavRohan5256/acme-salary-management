@@ -1199,8 +1199,8 @@ cd acme-salary-management
 MYSQL_DATABASE=acme_salary_management
 MYSQL_USERNAME=root
 MYSQL_PASSWORD=root
-MYSQL_ROOT_PASSWORD=root
 MYSQL_PORT=3307
+SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/acme_salary_management
 ```
 
 ### 3. Start MySQL and Spring Boot
