@@ -13,10 +13,14 @@ import { MatTabsModule } from '@angular/material/tabs';
 
 import { AnalyticsRoutingModule } from './analytics-routing.module';
 import { AnalyticsComponent } from './analytics.component';
+import { CountryAnalyticsComponent } from './country-analytics/country-analytics.component';
+import { DepartmentAnalyticsComponent } from './department-analytics/department-analytics.component';
 
 @NgModule({
   declarations: [
-    AnalyticsComponent
+    AnalyticsComponent,
+    CountryAnalyticsComponent,
+    DepartmentAnalyticsComponent
   ],
   imports: [
     CommonModule,

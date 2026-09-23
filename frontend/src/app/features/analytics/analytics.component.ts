@@ -36,22 +36,6 @@ export class AnalyticsComponent implements OnInit {
   countryError$: Observable<string | null>;
   departmentError$: Observable<string | null>;
 
-  countryDisplayedColumns: string[] = [
-    'country',
-    'employeeCount',
-    'currency',
-    'averageSalary',
-    'minimumSalary',
-    'maximumSalary'
-  ];
-
-  departmentDisplayedColumns: string[] = [
-    'department',
-    'employeeCount',
-    'currency',
-    'averageSalary'
-  ];
-
   constructor(
     private readonly store: Store,
     private readonly router: Router
