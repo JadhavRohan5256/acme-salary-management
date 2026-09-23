@@ -1,0 +1,35 @@
+.update-salary-card {
+  margin-top: 24px;
+}
+
+.salary-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 24px;
+  width: 100%;
+}
+
+.form-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    width: 100%;
+    mat-form-field {
+        width: calc(50% - 24px);
+    }
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.error-message {
+  margin-top: 8px;
+}
+
+.success-message {
+  margin-top: 8px;
+}

@@ -1,0 +1,78 @@
+<div class="employee-details-page">
+    <div class="page-header">
+        <button mat-stroked-button type="button" (click)="goBack()">
+            Back to Employees
+        </button>
+        <h1>Employee Details</h1>
+    </div>
+    <div *ngIf="loading$ | async" class="loading">
+        <mat-spinner></mat-spinner>
+    </div>
+    <mat-card *ngIf="!(loading$ | async) && (employee$ | async) as employee">
+        <mat-card-header>
+            <mat-card-title>
+                {{ employee.firstName }} {{ employee.lastName }}
+            </mat-card-title>
+            <mat-card-subtitle>
+                {{ employee.designation }}
+            </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+            <div class="details-grid">
+                <div class="detail-item">
+                    <span class="label">Employee ID</span>
+                    <span>{{ employee.id }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Email</span>
+                    <span>{{ employee.email }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Country</span>
+                    <span>
+                        {{ employee.country.name }}
+                        ({{ employee.country.code }})
+                    </span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Department</span>
+                    <span>{{ employee.department }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Designation</span>
+                    <span>{{ employee.designation }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Current Salary</span>
+                    <span>
+                        {{ employee.currentSalary | number }}
+                        {{ employee.currency.code }}
+                    </span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Currency</span>
+                    <span>
+                        {{ employee.currency.name }}
+                        ({{ employee.currency.code }})
+                    </span>
+                </div>
+            </div>
+            <div class="salary-action">
+                <button
+                    mat-raised-button 
+                    color="primary"
+                    [routerLink]="['/employees', employee.id, 'update-salary']"
+                >
+                    Update Salary
+                </button>
+            </div>
+        </mat-card-content>
+        <app-salary-history
+            *ngIf="employee"
+            [employeeId]="employee.id">
+        </app-salary-history>
+    </mat-card>
+    <div *ngIf="!(loading$ | async) && (error$ | async) as error" class="error-message">
+        {{ error }}
+    </div>
+</div>
