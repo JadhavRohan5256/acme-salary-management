@@ -7,6 +7,7 @@ services:
 
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USERNAME: ${MYSQL_USERNAME}
       MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
 
     ports:
@@ -25,7 +26,7 @@ services:
           "-h",
           "localhost",
           "-uroot",
-          "-p${MYSQL_PASSWORD}"
+          "-p${MYSQL_ROOT_PASSWORD}"
         ]
       interval: 10s
       timeout: 5s
@@ -35,26 +36,34 @@ services:
     networks:
       - acme-network
 
+
   backend:
     build:
-      context: ..
-      dockerfile: docker/Dockerfile
+      context: ../backend
+      dockerfile: Dockerfile
+
     container_name: acme-backend
     restart: unless-stopped
+
     depends_on:
       mysql:
         condition: service_healthy
+
     ports:
       - "8080:8080"
+
     environment:
-      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
+
     networks:
       - acme-network
 
+
 volumes:
   mysql_data:
+
 
 networks:
   acme-network:
