@@ -1,0 +1,33 @@
+<div class="dashboard">
+  <mat-toolbar>
+    <span>ACME Salary Management</span>
+    <span class="spacer"></span>
+    <ng-container *ngIf="user$ | async as user">
+      <span class="username">{{ user.username }}</span>
+      <button
+        mat-button
+        (click)="logout()"
+      >
+        Logout
+      </button>
+    </ng-container>
+  </mat-toolbar>
+  <main class="content">
+    <mat-card>
+      <mat-card-title>Dashboard</mat-card-title>
+      <mat-card-content>
+        <p>Welcome to ACME Salary Management.</p>
+        <ng-container *ngIf="user$ | async as user">
+          <p>
+            Logged in as:
+            <strong>{{ user.username }}</strong>
+          </p>
+          <p>
+            Role:
+            <strong>{{ user.role }}</strong>
+          </p>
+        </ng-container>
+      </mat-card-content>
+    </mat-card>
+  </main>
+</div>
