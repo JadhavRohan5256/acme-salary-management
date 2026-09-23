@@ -1,0 +1,128 @@
+# ============================================================
+
+# ACME Salary Management - Git Ignore
+
+# ============================================================
+
+# Environment / Secrets
+.env
+.env.*
+!.env.example
+
+*.secret
+*.key
+*.pem
+
+# Java / Maven
+target/
+**/target/
+
+*.class
+*.jar
+*.war
+*.ear
+
+# Maven wrapper generated files
+.mvn/timing.properties
+
+# Spring Boot
+spring.log
+
+# Application logs
+*.log
+logs/
+
+# Node.js / Angular
+node_modules/
+**/node_modules/
+
+dist/
+**/dist/
+
+.angular/
+**/.angular/
+
+.nx/
+**/.nx/
+
+coverage/
+**/coverage/
+
+.cache/
+**/.cache/
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Angular build / temporary files
+tmp/
+temp/
+
+# IDE - IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# IDE - Eclipse
+.classpath
+.project
+.settings/
+
+# IDE - VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# OS generated files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Windows
+*.stackdump
+
+# Docker
+docker-data/
+docker-volumes/
+
+# Docker Compose local override
+
+docker-compose.override.yml
+
+# Database local files / dumps
+*.sql.gz
+*.dump
+*.bak
+
+# Keep migration SQL files tracked
+
+!backend/**/src/main/resources/db/migration/*.sql
+
+# Test / temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# Generated files
+generated/
+**/generated/
+
+# Local configuration
+application-local.properties
+application-local.yml
+application-local.yaml
+
+# Reports
+reports/
+test-results/
+
+# Miscellaneous
+.DS_Store
+Thumbs.db
+::writing::
+/.metadata/
