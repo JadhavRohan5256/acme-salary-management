@@ -1,1 +1,72 @@
-<p>login works!</p>
+<div class="login-container">
+
+  <mat-card class="login-card">
+    <mat-card-header>
+      <mat-card-title> ACME Salary Management </mat-card-title>
+      <mat-card-subtitle>HR Manager Login</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form
+        [formGroup]="loginForm"
+        (ngSubmit)="submit()"
+      >
+        <mat-form-field appearance="outline">
+          <mat-label>Username</mat-label>
+          <input
+            matInput
+            type="text"
+            formControlName="username"
+            autocomplete="username"
+          />
+          <mat-error
+            *ngIf="loginForm.get('username')?.hasError('required')"
+          >
+            Username is required
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Password</mat-label>
+          <input
+            matInput
+            type="password"
+            formControlName="password"
+            autocomplete="current-password"
+          />
+          <mat-error
+            *ngIf="loginForm.get('password')?.hasError('required')"
+          >
+            Password is required
+          </mat-error>
+          <mat-error
+            *ngIf="loginForm.get('password')?.hasError('minlength')"
+          >
+            Password must be at least 6 characters
+          </mat-error>
+        </mat-form-field>
+
+        <div
+          class="error-message"
+          *ngIf="error$ | async as error"
+        >
+          {{ error }}
+        </div>
+
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          [disabled]="loading$ | async"
+        >
+          <mat-spinner
+            *ngIf="loading$ | async"
+            diameter="20"
+          ></mat-spinner>
+
+          <span *ngIf="!(loading$ | async)"> Login </span>
+        </button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>
