@@ -1,0 +1,75 @@
+.tab-content {
+  padding-top: 20px;
+}
+
+.analytics-content {
+  width: 100%;
+}
+
+.analytics-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.analytics-summary > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.analytics-summary mat-icon {
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+}
+
+.record-count {
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+}
+
+th {
+  font-weight: 600;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 32px;
+}
+
+.error-message {
+  padding: 12px 16px;
+  margin-bottom: 16px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 32px;
+  opacity: 0.7;
+}
+
+@media (max-width: 768px) {
+  .analytics-summary {
+    align-items: flex-start;
+    gap: 10px;
+    flex-direction: column;
+  }
+
+  .tab-content {
+    padding-top: 16px;
+  }
+}

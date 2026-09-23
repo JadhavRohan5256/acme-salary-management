@@ -1,0 +1,60 @@
+.update-salary-page {
+  padding: 24px;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  h1 {
+    margin: 0;
+  }
+
+  p {
+    margin: 4px 0 0;
+  }
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 48px;
+}
+
+.error-message {
+  margin-bottom: 16px;
+}
+
+.employee-summary {
+  margin-bottom: 24px;
+}
+
+.employee-info {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.employee-info > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .employee-info {
+    grid-template-columns: 1fr;
+  }
+
+  .page-header {
+    flex-direction: column;
+  }
+}

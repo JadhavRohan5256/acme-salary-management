@@ -1,0 +1,21 @@
+.dashboard {
+  min-height: 100vh;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.username {
+  margin-right: 16px;
+}
+
+.content {
+  padding: 24px;
+}
+
+.actions {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 24px;
+}

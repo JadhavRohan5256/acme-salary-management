@@ -1,0 +1,99 @@
+<div class="analytics-page">
+    <div class="page-header">
+        <button mat-stroked-button type="button" (click)="goBack()">
+            Back to Dashboard
+        </button>
+    </div>
+    <div class="page-header">
+        <div>
+            <h1>Analytics</h1>
+            <p>Salary and workforce overview</p>
+        </div>
+        <button mat-stroked-button color="primary" type="button" (click)="refresh()">
+            <mat-icon>refresh</mat-icon>
+            Refresh
+        </button>
+    </div>
+    <section class="overview-section">
+        <div *ngIf="overviewLoading$ | async" class="loading">
+            <mat-spinner diameter="40"></mat-spinner>
+        </div>
+        <div *ngIf="overviewError$ | async as error" class="error-message">
+            {{ error }}
+        </div>
+        <ng-container *ngIf="overview$ | async as overview">
+            <div class="overview-grid">
+                <mat-card class="overview-card">
+                    <mat-card-content>
+                        <div class="card-icon">
+                            <mat-icon>people</mat-icon>
+                        </div>
+                        <div class="card-content">
+                            <span class="card-label">
+                                Total Employees
+                            </span>
+
+                            <span class="card-value">
+                                {{ overview.totalEmployees | number }}
+                            </span>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+                <mat-card class="overview-card">
+                    <mat-card-content>
+                        <div class="card-icon">
+                            <mat-icon>public</mat-icon>
+                        </div>
+
+                        <div class="card-content">
+                            <span class="card-label">
+                                Total Countries
+                            </span>
+
+                            <span class="card-value">
+                                {{ overview.totalCountries | number }}
+                            </span>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+                <mat-card class="overview-card">
+                    <mat-card-content>
+                        <div class="card-icon">
+                            <mat-icon>business</mat-icon>
+                        </div>
+
+                        <div class="card-content">
+                            <span class="card-label">
+                                Total Departments
+                            </span>
+
+                            <span class="card-value">
+                                {{ overview.totalDepartments | number }}
+                            </span>
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+            </div>
+        </ng-container>
+    </section>
+
+    <section class="analytics-section">
+        <mat-card>
+            <mat-card-header>
+                <mat-card-title>
+                    Workforce Analytics
+                </mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <mat-tab-group>
+                    <mat-tab label="By Country">
+                        <app-country-analytics></app-country-analytics>
+                    </mat-tab>
+                    <mat-tab label="By Department">
+                       <app-department-analytics></app-department-analytics>
+                    </mat-tab>
+                </mat-tab-group>
+            </mat-card-content>
+        </mat-card>
+    </section>
+</div>

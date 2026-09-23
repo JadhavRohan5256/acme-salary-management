@@ -1,0 +1,50 @@
+<div class="update-salary-page">
+    <div class="page-header">
+        <button mat-stroked-button type="button" (click)="goBack()">
+            Back
+        </button>
+        <div>
+            <h1>Update Salary</h1>
+            <p>Update the employee's salary information.</p>
+        </div>
+    </div>
+    <div *ngIf="loading$ | async" class="loading">
+        <mat-spinner></mat-spinner>
+    </div>
+    <div *ngIf="error$ | async as error" class="error-message">
+        {{ error }}
+    </div>
+    <ng-container *ngIf="employee$ | async as employee">
+        <mat-card class="employee-summary">
+            <mat-card-header>
+                <mat-card-title>
+                    {{ employee.firstName }} {{ employee.lastName }}
+                </mat-card-title>
+                <mat-card-subtitle>
+                    {{ employee.designation }} · {{ employee.department }}
+                </mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="employee-info">
+                    <div>
+                        <span class="label">Email</span>
+                        <span>{{ employee.email }}</span>
+                    </div>
+                    <div>
+                        <span class="label">Country</span>
+                        <span>{{ employee.country.name }}</span>
+                    </div>
+                    <div>
+                        <span class="label">Current Salary</span>
+                        <span>
+                            {{ employee.currentSalary | number:'1.2-2' }}
+                            {{ employee.currency.code }}
+                        </span>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+        <app-update-salary [employeeId]="employee.id">
+        </app-update-salary>
+    </ng-container>
+</div>

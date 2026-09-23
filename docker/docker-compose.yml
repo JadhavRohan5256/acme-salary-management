@@ -60,6 +60,22 @@ services:
     networks:
       - acme-network
 
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+
+    container_name: acme-frontend
+    restart: unless-stopped
+
+    depends_on:
+      - backend
+
+    ports:
+      - "4200:80"
+
+    networks:
+      - acme-network
 
 volumes:
   mysql_data:
