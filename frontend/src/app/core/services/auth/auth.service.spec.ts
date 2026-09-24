@@ -1,26 +1,36 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { Router } from '@angular/router';
+
 import { AuthService } from './auth.service';
 import { LoginResponse } from '../../models/auth';
+import { environment } from '../../../../environments/environment.development';
 
 
 describe('AuthService', () => {
   let service: AuthService;
   let httpMock: HttpTestingController;
+  let router: jasmine.SpyObj<Router>;
+  const apiUrl = environment.apiUrl;
 
   beforeEach(() => {
+    router = jasmine.createSpyObj('Router', ['navigate']);
+
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule
       ],
       providers: [
-        AuthService
+        AuthService,
+        {
+          provide: Router,
+          useValue: router
+        }
       ]
     });
 
     service = TestBed.inject(AuthService);
     httpMock = TestBed.inject(HttpTestingController);
-
     localStorage.clear();
   });
 
@@ -52,34 +62,19 @@ describe('AuthService', () => {
 
     service.login(loginRequest).subscribe(result => {
       expect(result).toEqual(response);
-
-      expect(
-        localStorage.getItem('acme_access_token')
-      ).toBe('test-jwt-token');
-
-      expect(
-        JSON.parse(
-          localStorage.getItem('acme_user')!
-        )
-      ).toEqual(response.user);
+      expect(localStorage.getItem('acme_access_token')).toBe('test-jwt-token');
+      expect(JSON.parse(localStorage.getItem('acme_user')!)).toEqual(response.user);
     });
 
-    const request = httpMock.expectOne(
-      'http://localhost:8080/api/auth/login'
-    );
+    const request = httpMock.expectOne(`${apiUrl}/auth/login`);
 
     expect(request.request.method).toBe('POST');
-
     expect(request.request.body).toEqual(loginRequest);
-
     request.flush(response);
   });
 
   it('should return token', () => {
-    localStorage.setItem(
-      'acme_access_token',
-      'test-token'
-    );
+    localStorage.setItem('acme_access_token', 'test-token');
 
     expect(service.getToken()).toBe('test-token');
   });
@@ -91,11 +86,7 @@ describe('AuthService', () => {
       role: 'HR_MANAGER'
     };
 
-    localStorage.setItem(
-      'acme_user',
-      JSON.stringify(user)
-    );
-
+    localStorage.setItem('acme_user', JSON.stringify(user));
     expect(service.getUser()).toEqual(user);
   });
 
@@ -104,7 +95,8 @@ describe('AuthService', () => {
   });
 
   it('should return true when authenticated', () => {
-    localStorage.setItem('acme_access_token','test-token');
+    localStorage.setItem('acme_access_token', 'test-token');
+
     expect(service.isAuthenticated()).toBeTrue();
   });
 
@@ -112,8 +104,8 @@ describe('AuthService', () => {
     expect(service.isAuthenticated()).toBeFalse();
   });
 
-  it('should remove authentication data on logout', () => {
-    localStorage.setItem('acme_access_token','test-token');
+  it('should remove authentication data and navigate to login on logout', () => {
+    localStorage.setItem('acme_access_token', 'test-token');
 
     localStorage.setItem(
       'acme_user',
@@ -128,5 +120,6 @@ describe('AuthService', () => {
 
     expect(service.getToken()).toBeNull();
     expect(service.getUser()).toBeNull();
+    expect(router.navigate).toHaveBeenCalledWith(['/login']);
   });
 });

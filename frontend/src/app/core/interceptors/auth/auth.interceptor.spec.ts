@@ -6,13 +6,13 @@ import { AuthInterceptor } from './auth.interceptor';
 
 describe('AuthInterceptor', () => {
   let httpMock: HttpTestingController;
-  let httpClient: HttpClientTestingModule
+  let httpClient: HttpClient;
   let authService: jasmine.SpyObj<AuthService>;
 
   beforeEach(() => {
     authService = jasmine.createSpyObj(
       'AuthService',
-      ['getToken']
+      ['getToken', 'logout']
     );
 
     TestBed.configureTestingModule({
@@ -32,6 +32,7 @@ describe('AuthInterceptor', () => {
     });
 
     httpMock = TestBed.inject(HttpTestingController);
+    httpClient = TestBed.inject(HttpClient);
   });
 
   afterEach(() => {
@@ -44,10 +45,8 @@ describe('AuthInterceptor', () => {
     expect(interceptor).toBeTruthy();
   });
 
-
   it('should add Authorization header when token exists', () => {
     authService.getToken.and.returnValue('test-jwt-token');
-    const httpClient = TestBed.inject(HttpClient);
     httpClient.get('/api/employees').subscribe();
     const request = httpMock.expectOne('/api/employees');
 
@@ -57,10 +56,8 @@ describe('AuthInterceptor', () => {
     });
   });
 
-
   it('should not add Authorization header when token does not exist', () => {
     authService.getToken.and.returnValue(null);
-    const httpClient = TestBed.inject(HttpClient);
     httpClient.get('/api/employees').subscribe();
     const request = httpMock.expectOne('/api/employees');
 
@@ -68,5 +65,25 @@ describe('AuthInterceptor', () => {
     request.flush({
       content: []
     });
+  });
+
+  it('should logout when status code is 401', () => {
+    authService.getToken.and.returnValue('test-jwt-token');
+    httpClient.get('/api/employees').subscribe({
+      error: () => {}
+    });
+
+    const request = httpMock.expectOne('/api/employees');
+
+    request.flush(
+      {
+        message: 'Unauthorized'
+      },
+      {
+        status: 401,
+        statusText: 'Unauthorized'
+      }
+    );
+    expect(authService.logout).toHaveBeenCalled();
   });
 });
