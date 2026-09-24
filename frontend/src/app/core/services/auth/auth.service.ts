@@ -3,18 +3,20 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../../environments/environment.development';
 import { LoginRequest, LoginResponse, UserInfo } from '../../models/auth';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-
   private readonly apiUrl = `${environment.apiUrl}/auth`;
-
   private readonly tokenKey = 'acme_access_token';
   private readonly userKey = 'acme_user';
 
-  constructor(private readonly http: HttpClient) {}
+  constructor(
+    private readonly http: HttpClient,
+    private readonly router: Router
+  ) {}
 
   login(request: LoginRequest): Observable<LoginResponse> {
     return this.http
@@ -55,5 +57,6 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.userKey);
+    this.router.navigate(['/login'])
   }
 }
