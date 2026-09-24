@@ -97,7 +97,7 @@ public class SecurityConfig {
 
         configuration.setAllowedOrigins(List.of(
             "http://localhost:4200", 
-            "https://acme-salary-managements.vercel.app",
+            "https://acme-salary-managements.vercel.app"
         ));
         configuration.setAllowedMethods(
             List.of(
@@ -110,7 +110,7 @@ public class SecurityConfig {
         );
 
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
+        configuration.setAllowCredentials(false);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
