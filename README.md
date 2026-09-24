@@ -41,6 +41,7 @@ The application provides employee management, salary updates, salary history, au
 
 ```text
 acme-salary-management/
+
 │
 ├── frontend/
 │   ├── src/
@@ -54,9 +55,7 @@ acme-salary-management/
 │   └── pom.xml
 │
 ├── docker/
-│   ├── docker-compose.yml
-│   └── init/
-│       └── schema.sql
+│   └── docker-compose.yml
 │
 ├── .env
 └── README.md
@@ -66,23 +65,46 @@ acme-salary-management/
 
 # Hosted Application
 
+### Frontend
+
+The Angular frontend is hosted on Vercel.
+
+**Live Application:**
+
+https://acme-salary-managements.vercel.app/
+
 ### Backend
 
-[Hosted Swagger UI](https://acme-salary-management-1-3fwm.onrender.com/swagger-ui/index.html?utm_source=chatgpt.com)
+The Spring Boot REST API is hosted on Railway.
 
-Backend:
+**Backend:**
+
+https://acme-salary-management.up.railway.app
+
+**Swagger UI:**
+
+https://acme-salary-management.up.railway.app/swagger-ui/index.html
+
+**API Base URL:**
 
 ```text
-https://acme-salary-management-1-3fwm.onrender.com
+https://acme-salary-management.up.railway.app/api
 ```
 
-Login:
+> The backend may take a little longer to respond if the hosting service needs to wake the application.
+
+### Hosted Architecture
 
 ```text
-POST /api/auth/login
+Angular Frontend
+       │
+       │ HTTPS / REST API
+       ▼
+Spring Boot Backend
+       │
+       ▼
+     MySQL
 ```
-
-The Render instance may take a little longer to respond after being idle.
 
 ---
 
@@ -106,10 +128,15 @@ Frontend routing:
 
 ```text
 /login
+
 /dashboard
+
 /employees
+
 /employees/:id
+
 /employees/:id/update-salary
+
 /analytics
 ```
 
@@ -326,10 +353,15 @@ Create `.env` in the project root:
 
 ```env
 MYSQL_DATABASE=acme_salary_management
+
 MYSQL_USERNAME=root
+
 MYSQL_PASSWORD=root
+
 MYSQL_ROOT_PASSWORD=root
+
 MYSQL_PORT=3307
+
 SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/acme_salary_management
 ```
 
@@ -541,7 +573,7 @@ npm run build
 
 ---
 
-## Quick Start
+# Quick Start
 
 ```bash
 # 1. Clone the repository
@@ -549,10 +581,11 @@ npm run build
 # 2. Create .env in the project root
 
 # 3. Start the complete application
+
 docker compose --env-file .env -f docker/docker-compose.yml up --build
 ```
 
-Open:
+Open the local application:
 
 ```text
 Frontend:
@@ -565,11 +598,29 @@ Swagger:
 http://localhost:8080/swagger-ui/index.html
 ```
 
-Login:
+### Hosted Application
 
 ```text
-Username: hrmanager
-Password: Admin@123
+Frontend:
+https://acme-salary-managements.vercel.app/
+
+Backend:
+https://acme-salary-management.up.railway.app
+
+Swagger:
+https://acme-salary-management.up.railway.app/swagger-ui/index.html
+```
+
+### Login
+
+```text
+username: hrmanager
+password: Admin@123
+```
+
+```text
+username: acmemanager
+password: Admin@12345
 ```
 
 ---
