@@ -97,7 +97,7 @@ public class SecurityConfig {
 
         configuration.setAllowedOrigins(List.of(
             "http://localhost:4200", 
-            "https://acme-salary-management.up.railway.app"
+            "https://acme-salary-managements.vercel.app",
         ));
         configuration.setAllowedMethods(
             List.of(
